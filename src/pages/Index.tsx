@@ -13,30 +13,30 @@ const Index = () => {
       {/* Overlay for better text readability */}
       <div className="absolute inset-0 bg-overlay" />
       
-      {/* Content Container */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
-        {/* Logo with slide-up animation */}
-        <div className="animate-slide-up-fade">
+      {/* Content Container - Optimized for mobile */}
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-8 sm:px-6 md:px-8">
+        {/* Logo with slide-up animation - Better mobile sizing */}
+        <div className="animate-slide-up-fade w-full max-w-[280px] sm:max-w-[320px] md:max-w-md lg:max-w-lg xl:max-w-xl">
           <img
             src={japworldLogo}
             alt="JapWorld"
-            className="h-auto w-full max-w-md drop-shadow-2xl md:max-w-lg lg:max-w-xl"
+            className="h-auto w-full drop-shadow-2xl"
           />
         </div>
         
-        {/* Under Construction Text */}
-        <div className="animate-fade-in-delayed mt-8 text-center">
-          <p className="animate-shimmer text-sm font-medium uppercase tracking-[0.4em] md:text-base lg:text-lg">
+        {/* Under Construction Text - Better mobile spacing and sizing */}
+        <div className="animate-fade-in-delayed mt-6 sm:mt-8 md:mt-10 text-center px-2">
+          <p className="animate-shimmer text-[10px] sm:text-xs md:text-sm lg:text-base font-medium uppercase tracking-[0.25em] sm:tracking-[0.3em] md:tracking-[0.4em] leading-relaxed">
             Website Under Construction...
           </p>
         </div>
         
-        {/* Decorative bottom accent */}
-        <div className="animate-fade-in-delayed absolute bottom-8 left-1/2 -translate-x-1/2">
-          <div className="flex items-center gap-3">
-            <span className="h-px w-12 bg-gradient-to-r from-transparent to-primary/50" />
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-subtle" />
-            <span className="h-px w-12 bg-gradient-to-l from-transparent to-primary/50" />
+        {/* Decorative bottom accent - Better mobile positioning */}
+        <div className="animate-fade-in-delayed absolute bottom-6 sm:bottom-8 md:bottom-10 left-1/2 -translate-x-1/2">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="h-px w-8 sm:w-10 md:w-12 bg-gradient-to-r from-transparent to-primary/50" />
+            <span className="h-1 w-1 sm:h-1.5 sm:w-1.5 rounded-full bg-primary animate-pulse-subtle" />
+            <span className="h-px w-8 sm:w-10 md:w-12 bg-gradient-to-l from-transparent to-primary/50" />
           </div>
         </div>
       </div>

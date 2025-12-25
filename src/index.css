@@ -100,6 +100,15 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Zen Kaku Gothic New', sans-serif;
+    /* Better mobile rendering */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Improve mobile image rendering */
+  img {
+    @apply select-none;
+    -webkit-user-drag: none;
   }
 }
 
@@ -116,6 +125,18 @@
       hsl(var(--deep-charcoal) / 0.7) 100%
     );
   }
+  
+  /* Mobile-optimized background positioning */
+  @media (max-width: 640px) {
+    .bg-overlay {
+      background: linear-gradient(
+        180deg,
+        hsl(var(--deep-charcoal) / 0.4) 0%,
+        hsl(var(--deep-charcoal) / 0.6) 50%,
+        hsl(var(--deep-charcoal) / 0.75) 100%
+      );
+    }
+  }
 }
 
 @layer components {
@@ -127,6 +148,20 @@
     100% {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+  
+  /* Mobile-optimized slide animation */
+  @media (max-width: 640px) {
+    @keyframes slide-up-fade {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   }
 
@@ -160,10 +195,24 @@
   .animate-slide-up-fade {
     animation: slide-up-fade 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
+  
+  /* Faster animation on mobile for better performance */
+  @media (max-width: 640px) {
+    .animate-slide-up-fade {
+      animation: slide-up-fade 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+  }
 
   .animate-fade-in-delayed {
     animation: fade-in-delayed 1s ease-out 0.8s forwards;
     opacity: 0;
+  }
+  
+  @media (max-width: 640px) {
+    .animate-fade-in-delayed {
+      animation: fade-in-delayed 0.8s ease-out 0.6s forwards;
+      opacity: 0;
+    }
   }
 
   .animate-pulse-subtle {
@@ -182,5 +231,17 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  /* Respect reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-slide-up-fade,
+    .animate-fade-in-delayed,
+    .animate-pulse-subtle,
+    .animate-shimmer {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
   }
 }
