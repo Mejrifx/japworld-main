@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Zen Kaku Gothic New', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,6 +50,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sakura: "hsl(var(--sakura))",
+        "sunset-gold": "hsl(var(--sunset-gold))",
+        "deep-charcoal": "hsl(var(--deep-charcoal))",
+        "warm-cream": "hsl(var(--warm-cream))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
