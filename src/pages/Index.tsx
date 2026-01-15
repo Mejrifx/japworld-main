@@ -3,8 +3,15 @@
  * 
  * Structure:
  * 1. Password Gate - Wraps all content, requires password to access
- * 2. Hero Section - Background image with logo and construction notice
- * 3. About Section - Company information after scrolling
+ * 2. Navigation - Sticky header with section links
+ * 3. Hero Section - Background image with logo and construction notice
+ * 4. About Section - Company information
+ * 5. How It Works - Step-by-step import process
+ * 6. Services - Detailed service offerings
+ * 7. Interactive Tools - Auction search, alerts, calculator CTAs
+ * 8. Testimonials - Client success stories
+ * 9. FAQ - Common questions
+ * 10. Footer - Contact info and legal
  * 
  * PASSWORD:
  * - Current password: "japanimport"
@@ -14,22 +21,35 @@
 import japworldBg from "@/assets/japworld-bg.png";
 import japworldLogo from "@/assets/japworld-logo.png";
 import PasswordGate from "@/components/PasswordGate";
+import Navigation from "@/components/Navigation";
 import AboutSection from "@/components/AboutSection";
+import HowItWorks from "@/components/HowItWorks";
+import Services from "@/components/Services";
+import InteractiveTools from "@/components/InteractiveTools";
+import Testimonials from "@/components/Testimonials";
+import FAQ from "@/components/FAQ";
+import Footer from "@/components/Footer";
 import { ChevronDown } from "lucide-react";
 
 const Index = () => {
   const scrollToAbout = () => {
-    window.scrollTo({
-      top: window.innerHeight,
-      behavior: "smooth"
-    });
+    const aboutSection = document.querySelector("#about");
+    if (aboutSection) {
+      const offset = 80;
+      const elementPosition = aboutSection.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    }
   };
 
   return (
     <PasswordGate>
+      {/* Navigation */}
+      <Navigation />
+
       <main className="relative w-full">
         {/* Hero Section - Full viewport height */}
-        <section className="relative min-h-screen w-full overflow-hidden">
+        <section id="hero" className="relative min-h-screen w-full overflow-hidden">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -50,9 +70,12 @@ const Index = () => {
               />
             </div>
             
-            {/* Under Construction Text - Better mobile spacing and sizing */}
+            {/* Tagline */}
             <div className="animate-fade-in-delayed mt-6 sm:mt-8 md:mt-10 text-center px-2">
-              <p className="animate-shimmer text-[10px] sm:text-xs md:text-sm lg:text-base font-medium uppercase tracking-[0.25em] sm:tracking-[0.3em] md:tracking-[0.4em] leading-relaxed">
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed">
+                Premium Japanese vehicle imports delivered worldwide
+              </p>
+              <p className="animate-shimmer mt-4 text-[10px] sm:text-xs md:text-sm font-medium uppercase tracking-[0.25em] sm:tracking-[0.3em] md:tracking-[0.4em] leading-relaxed">
                 Website Under Construction...
               </p>
             </div>
@@ -70,28 +93,27 @@ const Index = () => {
         </section>
 
         {/* About Section */}
-        <AboutSection />
+        <div id="about">
+          <AboutSection />
+        </div>
+
+        {/* How It Works Section */}
+        <HowItWorks />
+
+        {/* Services Section */}
+        <Services />
+
+        {/* Interactive Tools Section */}
+        <InteractiveTools />
+
+        {/* Testimonials Section */}
+        <Testimonials />
+
+        {/* FAQ Section */}
+        <FAQ />
 
         {/* Footer */}
-        <footer className="relative py-12 sm:py-16 border-t border-border/50">
-          <div className="container mx-auto px-4 text-center">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <span className="h-px w-12 bg-gradient-to-r from-transparent to-primary/30" />
-              <img 
-                src={japworldLogo} 
-                alt="JapWorld" 
-                className="h-8 sm:h-10 w-auto opacity-60"
-              />
-              <span className="h-px w-12 bg-gradient-to-l from-transparent to-primary/30" />
-            </div>
-            <p className="text-muted-foreground/60 text-sm">
-              © {new Date().getFullYear()} JapWorld. All rights reserved.
-            </p>
-            <p className="text-muted-foreground/40 text-xs mt-2">
-              Premium Japanese Vehicle Import Services
-            </p>
-          </div>
-        </footer>
+        <Footer />
       </main>
     </PasswordGate>
   );
