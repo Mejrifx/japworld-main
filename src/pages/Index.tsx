@@ -53,7 +53,7 @@ const Index = () => {
             
             {/* Tagline */}
             <div className="animate-fade-in-delayed mt-6 sm:mt-8 md:mt-10 text-center px-2">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display text-warm-cream mb-4">
+              <h1 className="animate-shimmer text-xs sm:text-sm md:text-base lg:text-lg font-medium uppercase tracking-[0.25em] sm:tracking-[0.3em] md:tracking-[0.4em] leading-relaxed mb-4">
                 Premium Japanese Vehicle Imports
               </h1>
               <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed mb-6">
