@@ -2,31 +2,32 @@
  * Navigation Component
  * 
  * Sticky top navigation with Japanese-styled design.
- * Links: About Us, How It Works, Services, Auctions, Cost Calculator, FAQ, Testimonials, Contact
+ * Uses React Router for multi-page navigation.
  * 
  * CUSTOMIZATION:
  * - Modify navLinks array to add/remove/reorder navigation items
- * - Adjust scroll offset in scrollToSection if header height changes
  */
 
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import japworldLogo from "@/assets/japworld-logo.png";
 
 const navLinks = [
-  { label: "About Us", href: "#about" },
-  { label: "How It Works", href: "#process" },
-  { label: "Services", href: "#services" },
-  { label: "Auctions", href: "#auctions" },
-  { label: "Cost Calculator", href: "#calculator" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Contact", href: "#contact" },
+  { label: "About Us", path: "/about" },
+  { label: "How It Works", path: "/how-it-works" },
+  { label: "Services", path: "/services" },
+  { label: "Auctions", path: "/auctions" },
+  { label: "Cost Calculator", path: "/calculator" },
+  { label: "FAQ", path: "/faq" },
+  { label: "Testimonials", path: "/testimonials" },
+  { label: "Contact", path: "/contact" },
 ];
 
 const Navigation = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,21 +55,10 @@ const Navigation = () => {
 
   const navOpacity = calculateOpacity();
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      const offset = 80; // Account for sticky header
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
+  // Close mobile menu when route changes
+  useEffect(() => {
     setIsMobileMenuOpen(false);
-  };
+  }, [location]);
 
   return (
     <>
@@ -81,9 +71,8 @@ const Navigation = () => {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
-            <a 
-              href="#hero" 
-              onClick={(e) => scrollToSection(e, "#hero")}
+            <Link 
+              to="/"
               className="flex-shrink-0"
             >
               <img 
@@ -91,39 +80,43 @@ const Navigation = () => {
                 alt="JapWorld" 
                 className="h-8 sm:h-10 w-auto"
               />
-            </a>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-2">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => scrollToSection(e, link.href)}
-                  className="
-                    relative
-                    px-4 py-2
-                    text-sm font-medium
-                    border-shoji
-                    bg-card/30 hover:bg-card/50
-                    text-muted-foreground hover:text-primary
-                    transition-all duration-300
-                    group
-                    active:scale-[0.98]
-                  "
-                >
-                  {/* Corner accents - top left */}
-                  <div className="absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {/* Corner accents - top right */}
-                  <div className="absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {/* Corner accents - bottom left */}
-                  <div className="absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {/* Corner accents - bottom right */}
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                  <span className="relative z-10">{link.label}</span>
-                </a>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`
+                      relative
+                      px-4 py-2
+                      text-sm font-medium
+                      border-shoji
+                      ${isActive 
+                        ? 'bg-card/60 text-primary' 
+                        : 'bg-card/30 hover:bg-card/50 text-muted-foreground hover:text-primary'
+                      }
+                      transition-all duration-300
+                      group
+                      active:scale-[0.98]
+                    `}
+                  >
+                    {/* Corner accents - top left */}
+                    <div className={`absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    {/* Corner accents - top right */}
+                    <div className={`absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    {/* Corner accents - bottom left */}
+                    <div className={`absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    {/* Corner accents - bottom right */}
+                    <div className={`absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    
+                    <span className="relative z-10">{link.label}</span>
+                  </Link>
+                );
+              })}
             </div>
 
             {/* Mobile Menu Button */}
@@ -171,35 +164,39 @@ const Navigation = () => {
         >
           <div className="container mx-auto px-4 py-4">
             <div className="flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => scrollToSection(e, link.href)}
-                  className="
-                    relative
-                    px-4 py-3
-                    text-base font-medium
-                    border-shoji
-                    bg-card/30 hover:bg-card/50
-                    text-muted-foreground hover:text-primary
-                    transition-all duration-300
-                    group
-                    active:scale-[0.98]
-                  "
-                >
-                  {/* Corner accents - top left */}
-                  <div className="absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {/* Corner accents - top right */}
-                  <div className="absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {/* Corner accents - bottom left */}
-                  <div className="absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {/* Corner accents - bottom right */}
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                  <span className="relative z-10">{link.label}</span>
-                </a>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`
+                      relative
+                      px-4 py-3
+                      text-base font-medium
+                      border-shoji
+                      ${isActive 
+                        ? 'bg-card/60 text-primary' 
+                        : 'bg-card/30 hover:bg-card/50 text-muted-foreground hover:text-primary'
+                      }
+                      transition-all duration-300
+                      group
+                      active:scale-[0.98]
+                    `}
+                  >
+                    {/* Corner accents - top left */}
+                    <div className={`absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    {/* Corner accents - top right */}
+                    <div className={`absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    {/* Corner accents - bottom left */}
+                    <div className={`absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    {/* Corner accents - bottom right */}
+                    <div className={`absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    
+                    <span className="relative z-10">{link.label}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

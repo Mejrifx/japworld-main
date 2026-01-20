@@ -9,32 +9,23 @@
  * - Add/remove footer sections as required
  */
 
+import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Instagram, Facebook, Youtube } from "lucide-react";
 import japworldLogo from "@/assets/japworld-logo.png";
 
 const quickLinks = [
-  { label: "About Us", href: "#about" },
-  { label: "How It Works", href: "#process" },
-  { label: "Services", href: "#services" },
-  { label: "Auctions", href: "#auctions" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact", href: "#contact" },
+  { label: "About Us", path: "/about" },
+  { label: "How It Works", path: "/how-it-works" },
+  { label: "Services", path: "/services" },
+  { label: "Auctions", path: "/auctions" },
+  { label: "FAQ", path: "/faq" },
+  { label: "Contact", path: "/contact" },
 ];
 
 const Footer = () => {
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-    }
-  };
 
   return (
-    <footer id="contact" className="relative bg-card/50 border-t border-border/50">
+    <footer className="relative bg-card/50 border-t border-border/50">
       {/* Decorative top border */}
       <div className="absolute top-0 left-0 right-0 h-px">
         <div className="h-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
@@ -88,14 +79,13 @@ const Footer = () => {
             </h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    onClick={(e) => scrollToSection(e, link.href)}
+                <li key={link.path}>
+                  <Link
+                    to={link.path}
                     className="text-muted-foreground hover:text-primary transition-colors text-sm"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
