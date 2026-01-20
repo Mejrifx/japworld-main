@@ -25,16 +25,34 @@ const navLinks = [
 ];
 
 const Navigation = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setScrollY(window.scrollY);
     };
     window.addEventListener("scroll", handleScroll);
+    // Set initial scroll position
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Calculate opacity: starts at 0.15 at top, reaches 0.95 at 100px scroll
+  const calculateOpacity = () => {
+    const maxScroll = 100; // Full opacity reached at 100px
+    const minOpacity = 0.15; // Minimum opacity at top
+    const maxOpacity = 0.95; // Maximum opacity when scrolled
+    
+    if (scrollY <= 0) return minOpacity;
+    if (scrollY >= maxScroll) return maxOpacity;
+    
+    // Linear interpolation
+    const ratio = scrollY / maxScroll;
+    return minOpacity + (maxOpacity - minOpacity) * ratio;
+  };
+
+  const navOpacity = calculateOpacity();
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -55,14 +73,10 @@ const Navigation = () => {
   return (
     <>
       <nav
-        className={`
-          fixed top-0 left-0 right-0 z-50
-          transition-all duration-300
-          ${isScrolled 
-            ? 'bg-background/95 backdrop-blur-md border-b border-border/50 shadow-lg shadow-black/20' 
-            : 'bg-transparent'
-          }
-        `}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md border-b border-border/50 shadow-lg shadow-black/20"
+        style={{
+          backgroundColor: `hsl(var(--background) / ${navOpacity})`,
+        }}
       >
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 sm:h-20">
