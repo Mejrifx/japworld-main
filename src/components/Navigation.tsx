@@ -94,21 +94,34 @@ const Navigation = () => {
             </a>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-2">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   onClick={(e) => scrollToSection(e, link.href)}
                   className="
-                    px-3 py-2 text-sm font-medium
+                    relative
+                    px-4 py-2
+                    text-sm font-medium
+                    border-shoji
+                    bg-card/30 hover:bg-card/50
                     text-muted-foreground hover:text-primary
-                    transition-colors duration-200
-                    relative group
+                    transition-all duration-300
+                    group
+                    active:scale-[0.98]
                   "
                 >
-                  {link.label}
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-px bg-primary transition-all duration-200 group-hover:w-3/4" />
+                  {/* Corner accents - top left */}
+                  <div className="absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Corner accents - top right */}
+                  <div className="absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Corner accents - bottom left */}
+                  <div className="absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Corner accents - bottom right */}
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  <span className="relative z-10">{link.label}</span>
                 </a>
               ))}
             </div>
@@ -116,14 +129,32 @@ const Navigation = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-foreground hover:text-primary transition-colors"
+              className="
+                lg:hidden
+                relative
+                p-2.5
+                border-shoji
+                bg-card/30 hover:bg-card/50
+                text-foreground hover:text-primary
+                transition-all duration-300
+                group
+                active:scale-[0.98]
+              "
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+              {/* Corner accents */}
+              <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-l border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-r border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              <span className="relative z-10">
+                {isMobileMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
+              </span>
             </button>
           </div>
         </div>
@@ -139,20 +170,34 @@ const Navigation = () => {
           `}
         >
           <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   onClick={(e) => scrollToSection(e, link.href)}
                   className="
-                    px-4 py-3 text-base font-medium
-                    text-muted-foreground hover:text-primary hover:bg-primary/5
-                    transition-colors duration-200
-                    border-l-2 border-transparent hover:border-primary
+                    relative
+                    px-4 py-3
+                    text-base font-medium
+                    border-shoji
+                    bg-card/30 hover:bg-card/50
+                    text-muted-foreground hover:text-primary
+                    transition-all duration-300
+                    group
+                    active:scale-[0.98]
                   "
                 >
-                  {link.label}
+                  {/* Corner accents - top left */}
+                  <div className="absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Corner accents - top right */}
+                  <div className="absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Corner accents - bottom left */}
+                  <div className="absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Corner accents - bottom right */}
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  <span className="relative z-10">{link.label}</span>
                 </a>
               ))}
             </div>
