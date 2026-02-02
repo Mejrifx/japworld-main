@@ -103,6 +103,24 @@
     /* Better mobile rendering */
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+    /* Prevent horizontal scrolling/swiping */
+    overflow-x: hidden;
+    touch-action: pan-y pinch-zoom;
+  }
+  
+  html {
+    overflow-x: hidden;
+    touch-action: pan-y pinch-zoom;
+  }
+  
+  /* Prevent horizontal overflow on all elements */
+  * {
+    max-width: 100%;
+  }
+  
+  /* Ensure main containers don't overflow */
+  main, section, .container {
+    overflow-x: hidden;
   }
   
   /* Improve mobile image rendering */

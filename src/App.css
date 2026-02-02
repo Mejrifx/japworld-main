@@ -4,6 +4,8 @@
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+  position: relative;
 }
 
 /* Ensure smooth scrolling on mobile */
@@ -11,12 +13,26 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
 }
 
 /* Prevent horizontal scroll on mobile */
 body {
   overflow-x: hidden;
   width: 100%;
+  position: relative;
+  /* Prevent horizontal panning/swiping on touch devices */
+  touch-action: pan-y pinch-zoom;
+}
+
+/* Prevent horizontal scroll on all main containers */
+main {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
 }
 
 /* Better touch targets for mobile */
@@ -24,6 +40,18 @@ body {
   button, a {
     min-height: 44px;
     min-width: 44px;
+  }
+  
+  /* Prevent horizontal scrolling on mobile */
+  * {
+    max-width: 100%;
+  }
+  
+  /* Ensure containers don't cause overflow */
+  .container,
+  section,
+  div {
+    overflow-x: hidden;
   }
 }
 
