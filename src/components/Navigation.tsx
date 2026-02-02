@@ -60,6 +60,18 @@ const Navigation = () => {
     setIsMobileMenuOpen(false);
   }, [location]);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <>
       <nav
@@ -151,56 +163,94 @@ const Navigation = () => {
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        <div
-          className={`
-            lg:hidden absolute top-full left-0 right-0
-            bg-background/98 backdrop-blur-md
-            border-b border-border/50
-            transition-all duration-300 overflow-hidden
-            ${isMobileMenuOpen ? 'max-h-[calc(100vh-4rem)] opacity-100' : 'max-h-0 opacity-0'}
-          `}
-        >
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-col gap-2">
-              {navLinks.map((link) => {
-                const isActive = location.pathname === link.path;
-                return (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`
-                      relative
-                      px-4 py-3
-                      text-base font-medium
-                      border-shoji
-                      ${isActive 
-                        ? 'bg-card/60 text-primary' 
-                        : 'bg-card/30 hover:bg-card/50 text-muted-foreground hover:text-primary'
-                      }
-                      transition-all duration-300
-                      group
-                      active:scale-[0.98]
-                    `}
-                  >
-                    {/* Corner accents - top left */}
-                    <div className={`absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
-                    {/* Corner accents - top right */}
-                    <div className={`absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
-                    {/* Corner accents - bottom left */}
-                    <div className={`absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
-                    {/* Corner accents - bottom right */}
-                    <div className={`absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
-                    
-                    <span className="relative z-10">{link.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
       </nav>
+
+      {/* Mobile Menu Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className="
+            lg:hidden fixed inset-0 z-40
+            bg-black/60 backdrop-blur-sm
+            transition-opacity duration-300
+          "
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile Menu Slide-in Panel */}
+      <div
+        className={`
+          lg:hidden fixed top-0 right-0 bottom-0 z-50
+          w-80 max-w-[85vw]
+          bg-background/98 backdrop-blur-md
+          border-l border-border/50
+          shadow-2xl shadow-black/40
+          transition-transform duration-300 ease-out
+          ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}
+        `}
+      >
+        {/* Close Button */}
+        <div className="flex items-center justify-between p-4 border-b border-border/50">
+          <span className="text-primary/40 text-sm font-display">メニュー</span>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="
+              relative
+              p-2
+              border-shoji
+              bg-card/30 hover:bg-card/50
+              text-foreground hover:text-primary
+              transition-all duration-300
+              group
+              active:scale-[0.98]
+            "
+            aria-label="Close menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Navigation Links - Center Aligned */}
+        <div className="flex flex-col items-center gap-3 p-6 pt-8">
+          {navLinks.map((link) => {
+            const isActive = location.pathname === link.path;
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`
+                  relative
+                  w-full max-w-xs
+                  px-6 py-4
+                  text-base font-medium
+                  border-shoji
+                  ${isActive 
+                    ? 'bg-card/60 text-primary' 
+                    : 'bg-card/30 hover:bg-card/50 text-muted-foreground hover:text-primary'
+                  }
+                  transition-all duration-300
+                  group
+                  active:scale-[0.98]
+                  text-center
+                `}
+              >
+                {/* Corner accents - top left */}
+                <div className={`absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                {/* Corner accents - top right */}
+                <div className={`absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                {/* Corner accents - bottom left */}
+                <div className={`absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                {/* Corner accents - bottom right */}
+                <div className={`absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                
+                <span className="relative z-10">{link.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Spacer for fixed nav */}
       <div className="h-0" />
