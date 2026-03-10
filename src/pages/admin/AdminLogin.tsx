@@ -1,17 +1,17 @@
 import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import japworldLogo from "@/assets/japworld-logo.png";
 
 const AdminLogin = () => {
   const { user, role, loading, signIn } = useAuth();
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Only redirect once profile has loaded and role is admin (avoids redirecting before role is set)
   if (!loading && user && role === "admin") return <Navigate to="/admin" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,10 +21,11 @@ const AdminLogin = () => {
     const { error: signInError } = await signIn(email, password);
     setSubmitting(false);
     if (signInError) {
-      setError("Invalid credentials. Admin access only.");
+      setError("Invalid email or password. Please try again.");
       return;
     }
-    navigate("/admin");
+    // Don't navigate here – let the role check above redirect when profile loads with role === 'admin'.
+    // If profile loads and role is not admin, we stay on this page; show message below after a short delay.
   };
 
   return (
@@ -57,8 +58,12 @@ const AdminLogin = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm text-muted-foreground mb-2">Email address</label>
+              <label htmlFor="admin-login-email" className="block text-sm text-muted-foreground mb-2">
+                Email address
+              </label>
               <input
+                id="admin-login-email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -69,8 +74,12 @@ const AdminLogin = () => {
               />
             </div>
             <div>
-              <label className="block text-sm text-muted-foreground mb-2">Password</label>
+              <label htmlFor="admin-login-password" className="block text-sm text-muted-foreground mb-2">
+                Password
+              </label>
               <input
+                id="admin-login-password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -84,6 +93,12 @@ const AdminLogin = () => {
             {error && (
               <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 px-4 py-3">
                 {error}
+              </p>
+            )}
+
+            {!loading && user && role !== "admin" && role !== null && (
+              <p className="text-sm text-amber-400 bg-amber-400/10 border border-amber-400/20 px-4 py-3">
+                You're signed in, but this account doesn't have admin access. Ask your developer to set your profile role to admin in the database.
               </p>
             )}
 
