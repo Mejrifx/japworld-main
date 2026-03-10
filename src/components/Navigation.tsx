@@ -10,8 +10,9 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn, LayoutDashboard, ShieldCheck } from "lucide-react";
 import japworldLogo from "@/assets/japworld-logo.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { label: "About Us", path: "/about" },
@@ -28,6 +29,7 @@ const Navigation = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, role } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -129,6 +131,35 @@ const Navigation = () => {
                   </Link>
                 );
               })}
+
+              {/* Portal / Login button */}
+              <div className="ml-2 pl-2 border-l border-border/40">
+                {user && role === "admin" ? (
+                  <Link
+                    to="/admin"
+                    className="relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-shoji bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 group"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    Admin
+                  </Link>
+                ) : user && role === "client" ? (
+                  <Link
+                    to="/portal"
+                    className="relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-shoji bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 group"
+                  >
+                    <LayoutDashboard className="h-3.5 w-3.5" />
+                    My Portal
+                  </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-shoji bg-card/30 hover:bg-card/50 text-muted-foreground hover:text-primary transition-all duration-300 group"
+                  >
+                    <LogIn className="h-3.5 w-3.5" />
+                    Client Login
+                  </Link>
+                )}
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
@@ -249,6 +280,38 @@ const Navigation = () => {
               </Link>
             );
           })}
+
+          {/* Portal / Login mobile link */}
+          <div className="w-full max-w-xs pt-2 border-t border-border/50 mt-1">
+            {user && role === "admin" ? (
+              <Link
+                to="/admin"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="relative w-full flex items-center justify-center gap-2 px-6 py-4 text-base font-medium border-shoji bg-primary/10 text-primary transition-all duration-300"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Admin Portal
+              </Link>
+            ) : user && role === "client" ? (
+              <Link
+                to="/portal"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="relative w-full flex items-center justify-center gap-2 px-6 py-4 text-base font-medium border-shoji bg-primary/10 text-primary transition-all duration-300"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                My Portal
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="relative w-full flex items-center justify-center gap-2 px-6 py-4 text-base font-medium border-shoji bg-card/30 hover:bg-card/50 text-muted-foreground hover:text-primary transition-all duration-300"
+              >
+                <LogIn className="h-4 w-4" />
+                Client Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
