@@ -173,6 +173,25 @@ export function useClientById(clientId: string | undefined) {
   });
 }
 
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+
+export function useProfileByClientId(clientId: string | undefined) {
+  return useQuery<Profile | null>({
+    queryKey: ["admin_profile_by_client", clientId],
+    queryFn: async () => {
+      if (!clientId) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("client_id", clientId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!clientId,
+  });
+}
+
 export function useClientTransactions(clientId: string | undefined) {
   return useQuery<Transaction[]>({
     queryKey: ["admin_transactions", clientId],

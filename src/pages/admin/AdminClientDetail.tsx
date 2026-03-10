@@ -18,6 +18,7 @@ import {
   useClientInvoices,
   useClientVehicles,
   useVehicleDocuments,
+  useProfileByClientId,
   useUpdateClient,
   useRecordPayment,
   useCreateInvoice,
@@ -36,6 +37,8 @@ import {
   INVOICE_STATUS_LABELS,
   INVOICE_STATUS_COLORS,
 } from "@/hooks/usePortalData";
+import { supabase } from "@/lib/supabase";
+import { useQueryClient } from "@tanstack/react-query";
 import type {
   VehicleStatus,
   InvoiceStatus,
@@ -224,7 +227,9 @@ function VehicleDocPanel({ vehicleId, clientId }: { vehicleId: string; clientId:
 // ─── Main component ───────────────────────────────────────
 const AdminClientDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const qc = useQueryClient();
   const { data: client, isLoading } = useClientById(id);
+  const { data: profile } = useProfileByClientId(id);
   const { data: transactions = [] } = useClientTransactions(id);
   const { data: invoices = [] } = useClientInvoices(id);
   const { data: vehicles = [] } = useClientVehicles(id);
@@ -269,6 +274,13 @@ const AdminClientDetail = () => {
   });
   const [vehicleError, setVehicleError] = useState<string | null>(null);
   const [showVehicleForm, setShowVehicleForm] = useState(false);
+
+  // Create client portal login
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const balance = computeBalance(transactions);
   const outstanding = computeOutstanding(invoices);
@@ -338,6 +350,60 @@ const AdminClientDetail = () => {
       setShowVehicleForm(false);
     } catch (err: unknown) {
       setVehicleError(err instanceof Error ? err.message : "Failed.");
+    }
+  };
+
+  const handleCreateLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError(null);
+    setLoginSuccess(false);
+    const email = loginForm.email.trim();
+    const password = loginForm.password;
+    if (!email || !password) {
+      setLoginError("Email and password are required.");
+      return;
+    }
+    if (password.length < 6) {
+      setLoginError("Password must be at least 6 characters.");
+      return;
+    }
+    setLoginLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { role: "client", client_id: id },
+        },
+      });
+      if (error) throw error;
+      setLoginSuccess(true);
+      setLoginForm({ email: "", password: "" });
+      qc.invalidateQueries({ queryKey: ["admin_profile_by_client", id] });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to create login.";
+      setLoginError(
+        msg.includes("already registered") || msg.includes("already exists")
+          ? "This email is already registered. Use “Send password reset” below so the client can set a new password."
+          : msg
+      );
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleSendResetEmail = async () => {
+    if (!client?.email) return;
+    setLoginError(null);
+    setResetEmailSent(false);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(client.email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (error) throw error;
+      setResetEmailSent(true);
+    } catch (err: unknown) {
+      setLoginError(err instanceof Error ? err.message : "Failed to send reset email.");
     }
   };
 
@@ -446,6 +512,69 @@ const AdminClientDetail = () => {
             <p className="text-xs text-muted-foreground">
               Client since {format(new Date(client.created_at), "d MMMM yyyy")}
             </p>
+          </div>
+
+          {/* Portal login */}
+          <div className="mt-6 pt-6 border-t border-border/40">
+            <h3 className="font-display text-base text-foreground mb-3">Portal login</h3>
+            {profile ? (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  This client has portal access. They can sign in at your site’s Client Login page.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleSendResetEmail}
+                  disabled={resetEmailSent}
+                  className="text-sm text-primary hover:underline disabled:text-muted-foreground disabled:no-underline"
+                >
+                  {resetEmailSent ? "Reset email sent" : "Send password reset email"}
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleCreateLogin} className="space-y-4 max-w-sm">
+                <p className="text-sm text-muted-foreground">
+                  Create a login so this client can access the client portal (balance, invoices, vehicles, documents).
+                </p>
+                <div>
+                  <label className="block text-xs text-muted-foreground mb-1.5">Email *</label>
+                  <input
+                    type="email"
+                    required
+                    value={loginForm.email || (client?.email ?? "")}
+                    onChange={(e) => setLoginForm((f) => ({ ...f, email: e.target.value }))}
+                    className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                    placeholder={client?.email ?? "client@company.com"}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-muted-foreground mb-1.5">Temporary password *</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm((f) => ({ ...f, password: e.target.value }))}
+                    className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                    placeholder="Min 6 characters"
+                    autoComplete="new-password"
+                  />
+                </div>
+                {loginSuccess && (
+                  <p className="text-sm text-emerald-400">Login created. Share the email and password with the client.</p>
+                )}
+                {loginError && (
+                  <p className="text-sm text-destructive">{loginError}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={loginLoading}
+                  className="border-shoji bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50"
+                >
+                  {loginLoading ? "Creating…" : "Create login"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}

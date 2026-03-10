@@ -1,0 +1,11 @@
+# Build and deploy
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback: every path serves index.html so React Router can handle /admin/login, /portal, etc.
+# Without this, direct visits or bookmarks to those URLs return 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
