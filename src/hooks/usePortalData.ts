@@ -549,16 +549,23 @@ export function useDeleteClient() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) throw new Error("Not authenticated");
 
-      // Call Edge Function to delete both auth user and client data
-      const { data, error } = await supabase.functions.invoke("delete-auth-user", {
-        body: { userId: authUserId, clientId },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      // Use direct fetch for full control over headers
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-auth-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ userId: authUserId, clientId }),
+        }
+      );
 
-      if (error) {
-        throw new Error(error.message || "Failed to delete client");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || `Failed to delete client: ${response.status}`);
       }
 
       if (!data?.success) {

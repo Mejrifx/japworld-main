@@ -5,6 +5,16 @@ interface DeleteRequest {
   clientId: string;
 }
 
+// Get the user from request headers that Supabase Edge Runtime injects
+function getUserFromRequest(req: Request): { id: string } | null {
+  // Supabase Edge Runtime injects user info via x-supabase-user-id header
+  const userId = req.headers.get("x-supabase-user-id");
+  if (userId) {
+    return { id: userId };
+  }
+  return null;
+}
+
 Deno.serve(async (req) => {
   // CORS headers
   const corsHeaders = {
@@ -18,11 +28,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Get the JWT from the request
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    // Get user from request context (injected by Supabase Edge Runtime)
+    const user = getUserFromRequest(req);
+
+    if (!user) {
       return new Response(
-        JSON.stringify({ error: "Missing authorization header" }),
+        JSON.stringify({ error: "Unauthorized - no user context found" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -38,18 +49,6 @@ Deno.serve(async (req) => {
         },
       }
     );
-
-    // Verify the requesting user is an admin
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(
-      authHeader.replace("Bearer ", "")
-    );
-
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
     // Check if user is admin
     const { data: profile, error: profileError } = await supabaseAdmin
@@ -80,7 +79,7 @@ Deno.serve(async (req) => {
 
     if (deleteError) {
       // If user doesn't exist, that's okay - continue to delete client data
-      if (!deleteError.message?.includes("not found")) {
+      if (!deleteError.message?.includes("not found") && !deleteError.message?.includes("User not found")) {
         return new Response(
           JSON.stringify({ error: `Failed to delete auth user: ${deleteError.message}` }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
