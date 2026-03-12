@@ -108,9 +108,16 @@ const AdminClients = () => {
     }
 
     try {
+      // Fetch the profile for this client to get the auth user ID
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("client_id", clientToDelete.id)
+        .maybeSingle();
+
       await deleteClient.mutateAsync({
         clientId: clientToDelete.id,
-        authUserId: null, // We'll look up the auth user from the profile
+        authUserId: profile?.id, // This is the auth.users.id
       });
       setClientToDelete(null);
       setDeleteConfirmText("");

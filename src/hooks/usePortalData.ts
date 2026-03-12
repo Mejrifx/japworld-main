@@ -545,23 +545,22 @@ export function useDeleteClient() {
       clientId: string;
       authUserId?: string | null;
     }) => {
-      // Step 1: If we have the auth user ID, delete the auth user first
-      // This will cascade delete the profile due to ON DELETE CASCADE
-      if (authUserId) {
-        const { error: authError } = await supabase.auth.admin.deleteUser(authUserId);
-        // If admin API not available, try to delete via RPC or let RLS handle it
-        if (authError) {
-          // Fallback: delete from auth.users via service role or RPC
-          console.warn("Could not delete auth user via admin API:", authError.message);
-        }
+      // Get current session for Edge Function auth
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
+      // Call Edge Function to delete both auth user and client data
+      const { data, error } = await supabase.functions.invoke("delete-auth-user", {
+        body: { userId: authUserId, clientId },
+      });
+
+      if (error) {
+        throw new Error(error.message || "Failed to delete client");
       }
 
-      // Step 2: Delete the client record - this cascades to:
-      // - invoices (ON DELETE CASCADE)
-      // - transactions (ON DELETE CASCADE)
-      // - vehicles (ON DELETE CASCADE) -> vehicle_documents, vehicle_status_history
-      const { error } = await supabase.from("clients").delete().eq("id", clientId);
-      if (error) throw error;
+      if (!data?.success) {
+        throw new Error(data?.error || "Failed to delete client");
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin_clients"] });
