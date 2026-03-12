@@ -58,20 +58,20 @@ const AdminClients = () => {
       // Step 1: Create the client record
       const newClient = await createClient.mutateAsync(form);
 
-      // Step 2: Create the profile directly (bypass Supabase Auth)
-      // Generate a UUID for the profile id
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          role: "client",
-          client_id: newClient.id,
-        })
-        .select()
-        .single();
+      // Step 2: Create the Supabase auth user with the temp password
+      // Note: Email confirmation is disabled in Supabase, so user can log in immediately
+      const { error: authError } = await supabase.auth.signUp({
+        email: form.email,
+        password: tempPassword,
+        options: {
+          data: { role: "client", client_id: newClient.id },
+        },
+      });
 
-      if (profileError) {
+      if (authError) {
+        // Auth creation failed - client record exists but no login
         setFormError(
-          `Client created, but login creation failed: ${profileError.message}. You can create the login manually from the client's detail page.`
+          `Client created, but login creation failed: ${authError.message}. You can create the login manually from the client's detail page.`
         );
         return;
       }

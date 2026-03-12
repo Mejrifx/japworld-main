@@ -410,9 +410,19 @@ const AdminClientDetail = () => {
     }
   };
 
-  // Note: Reset email disabled - requires Supabase Auth which is currently disabled
   const handleSendResetEmail = async () => {
-    setLoginError("Password reset is temporarily unavailable. Please contact support.");
+    if (!client?.email) return;
+    setLoginError(null);
+    setResetEmailSent(false);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(client.email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (error) throw error;
+      setResetEmailSent(true);
+    } catch (err: unknown) {
+      setLoginError(err instanceof Error ? err.message : "Failed to send reset email.");
+    }
   };
 
   if (isLoading) {
