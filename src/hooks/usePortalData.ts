@@ -547,11 +547,14 @@ export function useDeleteClient() {
     }) => {
       // Get current session for Edge Function auth
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("Not authenticated");
+      if (!session?.access_token) throw new Error("Not authenticated");
 
       // Call Edge Function to delete both auth user and client data
       const { data, error } = await supabase.functions.invoke("delete-auth-user", {
         body: { userId: authUserId, clientId },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
       if (error) {
