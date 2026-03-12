@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -276,11 +276,20 @@ const AdminClientDetail = () => {
   const [showVehicleForm, setShowVehicleForm] = useState(false);
 
   // Create client portal login
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [loginForm, setLoginForm] = useState<{ email: string; password: string }>({ email: "", password: "" });
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const emailInitialized = useRef(false);
+
+  // Initialize email from client record when showing the form (no profile = no login yet)
+  useEffect(() => {
+    if (client?.email && !profile && !emailInitialized.current) {
+      setLoginForm((f) => ({ ...f, email: client.email }));
+      emailInitialized.current = true;
+    }
+  }, [client?.email, profile]);
 
   const balance = computeBalance(transactions);
   const outstanding = computeOutstanding(invoices);
@@ -541,7 +550,7 @@ const AdminClientDetail = () => {
                   <input
                     type="email"
                     required
-                    value={loginForm.email || (client?.email ?? "")}
+                    value={loginForm.email}
                     onChange={(e) => setLoginForm((f) => ({ ...f, email: e.target.value }))}
                     className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
                     placeholder={client?.email ?? "client@company.com"}

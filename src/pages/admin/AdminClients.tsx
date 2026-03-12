@@ -1,9 +1,20 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, ChevronRight, Users, Building2 } from "lucide-react";
+import { Plus, Search, ChevronRight, Users, Building2, Copy, Check } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAllClients, useCreateClient } from "@/hooks/usePortalData";
+import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
+
+// Generate a secure temporary password
+function generateTempPassword(length = 12): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
 
 const AdminClients = () => {
   const { data: clients = [], isLoading } = useAllClients();
@@ -19,6 +30,8 @@ const AdminClients = () => {
     notes: "",
   });
   const [formError, setFormError] = useState<string | null>(null);
+  const [createdLogin, setCreatedLogin] = useState<{ email: string; password: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const filtered = clients.filter(
     (c) =>
@@ -30,13 +43,50 @@ const AdminClients = () => {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    setCreatedLogin(null);
+
+    const tempPassword = generateTempPassword();
+
     try {
-      await createClient.mutateAsync(form);
-      setShowCreate(false);
+      // Step 1: Create the client record
+      const newClient = await createClient.mutateAsync(form);
+
+      // Step 2: Create the Supabase auth user with the temp password
+      const { error: authError } = await supabase.auth.signUp({
+        email: form.email,
+        password: tempPassword,
+        options: {
+          data: { role: "client", client_id: newClient.id },
+        },
+      });
+
+      if (authError) {
+        // Auth creation failed - client record exists but no login
+        setFormError(
+          `Client created, but login creation failed: ${authError.message}. You can create the login manually from the client's detail page.`
+        );
+        return;
+      }
+
+      // Success! Show the credentials
+      setCreatedLogin({ email: form.email, password: tempPassword });
       setForm({ company_name: "", contact_name: "", email: "", phone: "", notes: "" });
     } catch (err: unknown) {
       setFormError(err instanceof Error ? err.message : "Failed to create client.");
     }
+  };
+
+  const handleCopy = () => {
+    if (!createdLogin) return;
+    navigator.clipboard.writeText(`Email: ${createdLogin.email}\nPassword: ${createdLogin.password}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleClose = () => {
+    setShowCreate(false);
+    setCreatedLogin(null);
+    setFormError(null);
   };
 
   return (
@@ -64,92 +114,138 @@ const AdminClients = () => {
             <div className="absolute -bottom-2 -left-2 w-5 h-5 border-l-2 border-b-2 border-primary/60" />
             <div className="absolute -bottom-2 -right-2 w-5 h-5 border-r-2 border-b-2 border-primary/60" />
 
-            <h2 className="font-display text-xl text-foreground mb-6">Create New Client</h2>
-
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs text-muted-foreground mb-1.5">
-                    Company Name *
-                  </label>
-                  <input
-                    required
-                    value={form.company_name}
-                    onChange={(e) => setForm((f) => ({ ...f, company_name: e.target.value }))}
-                    className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-muted-foreground mb-1.5">
-                    Contact Name *
-                  </label>
-                  <input
-                    required
-                    value={form.contact_name}
-                    onChange={(e) => setForm((f) => ({ ...f, contact_name: e.target.value }))}
-                    className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1.5">Email *</label>
-                <input
-                  required
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1.5">Phone</label>
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                  className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1.5">Internal Notes</label>
-                <textarea
-                  rows={3}
-                  value={form.notes}
-                  onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-                  className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60 resize-none"
-                />
-              </div>
-
-              {formError && (
-                <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 px-4 py-3">
-                  {formError}
+            {createdLogin ? (
+              // Success state: show credentials
+              <div className="space-y-4">
+                <h2 className="font-display text-xl text-foreground">Client Created Successfully</h2>
+                <p className="text-sm text-muted-foreground">
+                  The client record and portal login have been created. Share these credentials with the client:
                 </p>
-              )}
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCreate(false)}
-                  className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createClient.isPending}
-                  className="border-shoji bg-primary/10 hover:bg-primary/20 text-primary px-5 py-2.5 text-sm font-medium transition-all duration-200 disabled:opacity-50"
-                >
-                  {createClient.isPending ? "Creating…" : "Create Client"}
-                </button>
+                <div className="border-shoji bg-primary/5 p-4 space-y-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Email</p>
+                    <p className="text-foreground font-medium">{createdLogin.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Temporary Password</p>
+                    <p className="text-foreground font-medium font-mono text-sm">{createdLogin.password}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleCopy}
+                    className="flex items-center gap-2 border-shoji bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 text-sm font-medium transition-all"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {copied ? "Copied!" : "Copy Credentials"}
+                  </button>
+                  <button
+                    onClick={handleClose}
+                    className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  The client can sign in at your site’s Client Login page. They should change their password after first login.
+                </p>
               </div>
-            </form>
+            ) : (
+              // Create form
+              <>
+                <h2 className="font-display text-xl text-foreground mb-6">Create New Client</h2>
 
-            <div className="mt-4 pt-4 border-t border-border/50">
-              <p className="text-xs text-muted-foreground">
-                After creating the client record, go to their detail page to set up their login
-                credentials via Supabase Auth.
-              </p>
-            </div>
+                <form onSubmit={handleCreate} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-muted-foreground mb-1.5">
+                        Company Name *
+                      </label>
+                      <input
+                        required
+                        value={form.company_name}
+                        onChange={(e) => setForm((f) => ({ ...f, company_name: e.target.value }))}
+                        className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-muted-foreground mb-1.5">
+                        Contact Name *
+                      </label>
+                      <input
+                        required
+                        value={form.contact_name}
+                        onChange={(e) => setForm((f) => ({ ...f, contact_name: e.target.value }))}
+                        className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted-foreground mb-1.5">Email *</label>
+                    <input
+                      required
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                      className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This email will be used for the client&apos;s portal login
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted-foreground mb-1.5">Phone</label>
+                    <input
+                      type="tel"
+                      value={form.phone}
+                      onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                      className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted-foreground mb-1.5">Internal Notes</label>
+                    <textarea
+                      rows={3}
+                      value={form.notes}
+                      onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                      className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60 resize-none"
+                    />
+                  </div>
+
+                  {formError && (
+                    <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 px-4 py-3">
+                      {formError}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleClose}
+                      className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={createClient.isPending}
+                      className="border-shoji bg-primary/10 hover:bg-primary/20 text-primary px-5 py-2.5 text-sm font-medium transition-all duration-200 disabled:opacity-50"
+                    >
+                      {createClient.isPending ? "Creating…" : "Create Client + Login"}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="mt-4 pt-4 border-t border-border/50">
+                  <p className="text-xs text-muted-foreground">
+                    A temporary password will be auto-generated and displayed after creation. You&apos;ll share it with the client.
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
