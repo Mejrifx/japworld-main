@@ -23,9 +23,11 @@ import {
   useRecordPayment,
   useCreateInvoice,
   useUpdateInvoiceStatus,
+  useDeleteInvoice,
   useCreateVehicle,
   useUpdateVehicleStatus,
   useUpdateVehicle,
+  useDeleteVehicle,
   useUploadVehicleDocument,
   useDeleteVehicleDocument,
   useSignedDocumentUrl,
@@ -238,12 +240,19 @@ const AdminClientDetail = () => {
   const recordPayment = useRecordPayment();
   const createInvoice = useCreateInvoice();
   const updateInvoiceStatus = useUpdateInvoiceStatus();
+  const deleteInvoice = useDeleteInvoice();
   const createVehicle = useCreateVehicle();
   const updateVehicleStatus = useUpdateVehicleStatus();
   const updateVehicle = useUpdateVehicle();
+  const deleteVehicle = useDeleteVehicle();
 
   const [activeTab, setActiveTab] = useState<Tab>("account");
   const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set());
+
+  // Delete confirmations
+  const [invoiceToDelete, setInvoiceToDelete] = useState<{ id: string; description: string } | null>(null);
+  const [vehicleToDelete, setVehicleToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [vehicleDocsToDelete, setVehicleDocsToDelete] = useState<{ id: string; storage_path: string }[]>([]);
 
   // Finance forms
   const [paymentForm, setPaymentForm] = useState({
@@ -711,7 +720,7 @@ const AdminClientDetail = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border/50">
-                      {["Invoice", "Date", "Due Date", "Amount", "Status", "Action"].map((h) => (
+                      {["Invoice", "Date", "Due Date", "Amount", "Status", "Action", ""].map((h) => (
                         <th key={h} className="text-left px-4 py-3 text-xs text-muted-foreground uppercase tracking-widest font-normal">
                           {h}
                         </th>
@@ -757,6 +766,15 @@ const AdminClientDetail = () => {
                               </option>
                             ))}
                           </select>
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => setInvoiceToDelete({ id: inv.id, description: inv.invoice_number || inv.description })}
+                            className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                            title="Delete invoice"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1017,12 +1035,21 @@ const AdminClientDetail = () => {
                             })
                           }
                           className="text-muted-foreground hover:text-primary transition-colors"
+                          title={isExpanded ? "Hide documents" : "Show documents"}
                         >
                           <ChevronDown
                             className={`h-4 w-4 transition-transform duration-200 ${
                               isExpanded ? "rotate-180" : ""
                             }`}
                           />
+                        </button>
+
+                        <button
+                          onClick={() => setVehicleToDelete({ id: v.id, name: v.name })}
+                          className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                          title="Delete vehicle"
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
@@ -1041,6 +1068,109 @@ const AdminClientDetail = () => {
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Delete Invoice Confirmation Modal ── */}
+      {invoiceToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="relative w-full max-w-md border-shoji bg-card p-8">
+            <div className="absolute -top-2 -left-2 w-5 h-5 border-l-2 border-t-2 border-destructive/60" />
+            <div className="absolute -top-2 -right-2 w-5 h-5 border-r-2 border-t-2 border-destructive/60" />
+            <div className="absolute -bottom-2 -left-2 w-5 h-5 border-l-2 border-b-2 border-destructive/60" />
+            <div className="absolute -bottom-2 -right-2 w-5 h-5 border-r-2 border-b-2 border-destructive/60" />
+
+            <h2 className="font-display text-xl text-foreground mb-4">Delete Invoice</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Are you sure you want to delete the invoice <strong className="text-foreground">{invoiceToDelete.description}</strong>?
+            </p>
+            <p className="text-sm text-destructive mb-6">
+              This will also remove any related transaction records. This action cannot be undone.
+            </p>
+
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setInvoiceToDelete(null)}
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    await deleteInvoice.mutateAsync({
+                      invoiceId: invoiceToDelete.id,
+                      clientId: id!,
+                    });
+                    setInvoiceToDelete(null);
+                  } catch {
+                    // Error handled by mutation
+                  }
+                }}
+                disabled={deleteInvoice.isPending}
+                className="border-shoji bg-destructive/10 hover:bg-destructive/20 text-destructive border-destructive/30 px-5 py-2.5 text-sm font-medium transition-all disabled:opacity-50"
+              >
+                {deleteInvoice.isPending ? "Deleting…" : "Delete Invoice"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete Vehicle Confirmation Modal ── */}
+      {vehicleToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="relative w-full max-w-md border-shoji bg-card p-8">
+            <div className="absolute -top-2 -left-2 w-5 h-5 border-l-2 border-t-2 border-destructive/60" />
+            <div className="absolute -top-2 -right-2 w-5 h-5 border-r-2 border-t-2 border-destructive/60" />
+            <div className="absolute -bottom-2 -left-2 w-5 h-5 border-l-2 border-b-2 border-destructive/60" />
+            <div className="absolute -bottom-2 -right-2 w-5 h-5 border-r-2 border-b-2 border-destructive/60" />
+
+            <h2 className="font-display text-xl text-foreground mb-4">Delete Vehicle</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Are you sure you want to delete <strong className="text-foreground">{vehicleToDelete.name}</strong>?
+            </p>
+            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 mb-4 ml-2">
+              <li>Vehicle record and all details</li>
+              <li>All photos, auction sheets, and documents</li>
+              <li>Status history</li>
+              <li>Files from storage</li>
+            </ul>
+            <p className="text-sm text-destructive mb-6">This action cannot be undone.</p>
+
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setVehicleToDelete(null)}
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  // Get documents for this vehicle to delete from storage
+                  const { data: docs } = await supabase
+                    .from("vehicle_documents")
+                    .select("id, storage_path")
+                    .eq("vehicle_id", vehicleToDelete.id);
+
+                  try {
+                    await deleteVehicle.mutateAsync({
+                      vehicleId: vehicleToDelete.id,
+                      clientId: id!,
+                      documents: docs || undefined,
+                    });
+                    setVehicleToDelete(null);
+                  } catch {
+                    // Error handled by mutation
+                  }
+                }}
+                disabled={deleteVehicle.isPending}
+                className="border-shoji bg-destructive/10 hover:bg-destructive/20 text-destructive border-destructive/30 px-5 py-2.5 text-sm font-medium transition-all disabled:opacity-50"
+              >
+                {deleteVehicle.isPending ? "Deleting…" : "Delete Vehicle"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </AdminLayout>

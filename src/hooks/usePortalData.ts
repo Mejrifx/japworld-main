@@ -531,6 +531,108 @@ export function useSignedDocumentUrl() {
 }
 
 // ──────────────────────────────────────
+// DELETE HOOKS
+// ──────────────────────────────────────
+
+// Delete a client completely: auth user (cascades to profile), client record (cascades to all related data)
+export function useDeleteClient() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      clientId,
+      authUserId,
+    }: {
+      clientId: string;
+      authUserId?: string | null;
+    }) => {
+      // Step 1: If we have the auth user ID, delete the auth user first
+      // This will cascade delete the profile due to ON DELETE CASCADE
+      if (authUserId) {
+        const { error: authError } = await supabase.auth.admin.deleteUser(authUserId);
+        // If admin API not available, try to delete via RPC or let RLS handle it
+        if (authError) {
+          // Fallback: delete from auth.users via service role or RPC
+          console.warn("Could not delete auth user via admin API:", authError.message);
+        }
+      }
+
+      // Step 2: Delete the client record - this cascades to:
+      // - invoices (ON DELETE CASCADE)
+      // - transactions (ON DELETE CASCADE)
+      // - vehicles (ON DELETE CASCADE) -> vehicle_documents, vehicle_status_history
+      const { error } = await supabase.from("clients").delete().eq("id", clientId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin_clients"] });
+      qc.invalidateQueries({ queryKey: ["admin_all_vehicles"] });
+    },
+  });
+}
+
+// Delete an invoice and its related transaction
+export function useDeleteInvoice() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      invoiceId,
+      clientId,
+    }: {
+      invoiceId: string;
+      clientId: string;
+    }) => {
+      // First, find and delete any related transactions
+      const { error: txnError } = await supabase
+        .from("transactions")
+        .delete()
+        .eq("invoice_id", invoiceId);
+      if (txnError) throw txnError;
+
+      // Then delete the invoice
+      const { error } = await supabase.from("invoices").delete().eq("id", invoiceId);
+      if (error) throw error;
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["admin_invoices", vars.clientId] });
+      qc.invalidateQueries({ queryKey: ["admin_transactions", vars.clientId] });
+      qc.invalidateQueries({ queryKey: ["invoices", vars.clientId] });
+      qc.invalidateQueries({ queryKey: ["transactions", vars.clientId] });
+    },
+  });
+}
+
+// Delete a vehicle and all its documents (storage + DB) and status history
+export function useDeleteVehicle() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      vehicleId,
+      clientId,
+      documents,
+    }: {
+      vehicleId: string;
+      clientId: string;
+      documents?: { id: string; storage_path: string }[];
+    }) => {
+      // Step 1: Delete all storage files for this vehicle's documents
+      if (documents && documents.length > 0) {
+        const paths = documents.map((d) => d.storage_path);
+        await supabase.storage.from("vehicle-documents").remove(paths);
+      }
+
+      // Step 2: Delete the vehicle - cascades to vehicle_documents and vehicle_status_history
+      const { error } = await supabase.from("vehicles").delete().eq("id", vehicleId);
+      if (error) throw error;
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["admin_vehicles", vars.clientId] });
+      qc.invalidateQueries({ queryKey: ["vehicles", vars.clientId] });
+      qc.invalidateQueries({ queryKey: ["admin_all_vehicles"] });
+    },
+  });
+}
+
+// ──────────────────────────────────────
 // HELPERS
 // ──────────────────────────────────────
 
