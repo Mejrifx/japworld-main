@@ -14,6 +14,7 @@ interface Profile {
   id: string;
   role: UserRole;
   client_id: string | null;
+  must_change_password: boolean;
 }
 
 interface AuthContextValue {
@@ -22,9 +23,11 @@ interface AuthContextValue {
   profile: Profile | null;
   role: UserRole | null;
   clientId: string | null;
+  mustChangePassword: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<{ error: string | null }>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -38,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadProfile = useCallback(async (userId: string) => {
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, role, client_id")
+      .select("id, role, client_id, must_change_password")
       .eq("id", userId)
       .single();
 
@@ -88,6 +91,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   };
 
+  const updatePassword = async (newPassword: string) => {
+    const { error: authError } = await supabase.auth.updateUser({ password: newPassword });
+    if (authError) return { error: authError.message };
+
+    // Clear the must_change_password flag in the profile
+    if (user) {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ must_change_password: false })
+        .eq("id", user.id);
+      if (profileError) return { error: profileError.message };
+
+      // Refresh local profile state
+      await loadProfile(user.id);
+    }
+
+    return { error: null };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -96,9 +118,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         role: profile?.role ?? null,
         clientId: profile?.client_id ?? null,
+        mustChangePassword: profile?.must_change_password ?? false,
         loading,
         signIn,
         signOut,
+        updatePassword,
       }}
     >
       {children}

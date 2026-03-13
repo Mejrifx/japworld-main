@@ -20,6 +20,7 @@ export interface Database {
           id: string;
           role: UserRole;
           client_id: string | null;
+          must_change_password: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -27,6 +28,7 @@ export interface Database {
           id: string;
           role?: UserRole;
           client_id?: string | null;
+          must_change_password?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -34,6 +36,7 @@ export interface Database {
           id?: string;
           role?: UserRole;
           client_id?: string | null;
+          must_change_password?: boolean;
           updated_at?: string;
         };
       };

@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ClientRouteProps {
@@ -6,7 +6,8 @@ interface ClientRouteProps {
 }
 
 export function ClientRoute({ children }: ClientRouteProps) {
-  const { user, role, loading } = useAuth();
+  const { user, role, mustChangePassword, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -19,6 +20,11 @@ export function ClientRoute({ children }: ClientRouteProps) {
   if (!user) return <Navigate to="/login" replace />;
   if (role === "admin") return <Navigate to="/admin" replace />;
   if (role !== "client") return <Navigate to="/login" replace />;
+
+  // Force password change before accessing any portal page
+  if (mustChangePassword && location.pathname !== "/portal/change-password") {
+    return <Navigate to="/portal/change-password" replace />;
+  }
 
   return <>{children}</>;
 }

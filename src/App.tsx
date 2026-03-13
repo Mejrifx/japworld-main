@@ -31,6 +31,7 @@ import PortalInvoices from "./pages/portal/PortalInvoices";
 import PortalVehicles from "./pages/portal/PortalVehicles";
 import PortalVehicleDetail from "./pages/portal/PortalVehicleDetail";
 import PortalStock from "./pages/portal/PortalStock";
+import ChangePassword from "./pages/portal/ChangePassword";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -71,6 +72,14 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
 
             {/* ── Client portal ── */}
+            <Route
+              path="/portal/change-password"
+              element={
+                <ClientRoute>
+                  <ChangePassword />
+                </ClientRoute>
+              }
+            />
             <Route
               path="/portal"
               element={
