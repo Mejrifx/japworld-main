@@ -5,18 +5,7 @@ interface DeleteRequest {
   clientId: string;
 }
 
-// Get the user from request headers that Supabase Edge Runtime injects
-function getUserFromRequest(req: Request): { id: string } | null {
-  // Supabase Edge Runtime injects user info via x-supabase-user-id header
-  const userId = req.headers.get("x-supabase-user-id");
-  if (userId) {
-    return { id: userId };
-  }
-  return null;
-}
-
 Deno.serve(async (req) => {
-  // CORS headers
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -28,17 +17,17 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Get user from request context (injected by Supabase Edge Runtime)
-    const user = getUserFromRequest(req);
-
-    if (!user) {
+    // Extract the Bearer token from the Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return new Response(
-        JSON.stringify({ error: "Unauthorized - no user context found" }),
+        JSON.stringify({ error: "Unauthorized - missing or invalid Authorization header" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    const token = authHeader.replace("Bearer ", "");
 
-    // Create Supabase client with service role key (from env)
+    // Create admin client with service role key
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SERVICE_ROLE_KEY")!,
@@ -50,44 +39,58 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Check if user is admin
+    // Validate the caller's token and get their user record
+    const { data: { user: callerUser }, error: callerError } = await supabaseAdmin.auth.getUser(token);
+
+    if (callerError || !callerUser) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - invalid token" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Verify the caller is an admin
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("profiles")
       .select("role")
-      .eq("id", user.id)
+      .eq("id", callerUser.id)
       .single();
 
     if (profileError || profile?.role !== "admin") {
       return new Response(
-        JSON.stringify({ error: "Admin access required" }),
+        JSON.stringify({ error: "Forbidden - admin access required" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Get request body
+    // Parse request body
     const { userId, clientId }: DeleteRequest = await req.json();
 
-    if (!userId || !clientId) {
+    if (!clientId) {
       return new Response(
-        JSON.stringify({ error: "Missing userId or clientId" }),
+        JSON.stringify({ error: "Missing clientId" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Delete the auth user
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
-
-    if (deleteError) {
-      // If user doesn't exist, that's okay - continue to delete client data
-      if (!deleteError.message?.includes("not found") && !deleteError.message?.includes("User not found")) {
-        return new Response(
-          JSON.stringify({ error: `Failed to delete auth user: ${deleteError.message}` }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    // Delete the auth user if an auth user ID was provided
+    if (userId) {
+      const { error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+      if (deleteAuthError) {
+        // If user doesn't exist in auth, that's fine — continue to delete client data
+        const notFound =
+          deleteAuthError.message?.toLowerCase().includes("not found") ||
+          deleteAuthError.message?.toLowerCase().includes("user not found");
+        if (!notFound) {
+          return new Response(
+            JSON.stringify({ error: `Failed to delete auth user: ${deleteAuthError.message}` }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
       }
     }
 
-    // Delete client record (cascades to all related data)
+    // Delete client record — cascades to all related data via ON DELETE CASCADE
     const { error: clientError } = await supabaseAdmin
       .from("clients")
       .delete()
@@ -101,7 +104,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: "Client and auth user deleted successfully" }),
+      JSON.stringify({ success: true, message: "Client deleted successfully" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
