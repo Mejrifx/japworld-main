@@ -435,7 +435,7 @@ const AdminClientDetail = () => {
     setResetEmailSent(false);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(client.email, {
-        redirectTo: `${window.location.origin}/login`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
       setResetEmailSent(true);

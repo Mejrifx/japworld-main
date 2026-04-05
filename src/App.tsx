@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 // Auth pages
 import Login from "./pages/Login";
 import AdminLogin from "./pages/admin/AdminLogin";
+import ResetPassword from "./pages/ResetPassword";
 
 // Client portal pages
 import PortalDashboard from "./pages/portal/PortalDashboard";
@@ -72,6 +73,7 @@ const App = () => (
             {/* ── Auth ── */}
             <Route path="/login" element={<Login />} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* ── Client portal ── */}
             <Route
