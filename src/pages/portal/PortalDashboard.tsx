@@ -70,12 +70,12 @@ const PortalDashboard = () => {
     <PortalLayout>
       {/* Header */}
       <div className="mb-8">
-        <p className="text-primary/50 text-xs font-display tracking-widest mb-1">ダッシュボード</p>
-        <h1 className="font-display text-3xl text-foreground">
+        <p className="text-primary/50 text-xs font-display tracking-widest mb-1 font-semibold">ダッシュボード</p>
+        <h1 className="font-display text-3xl font-bold text-foreground">
           Welcome back{client?.contact_name ? `, ${client.contact_name}` : ""}
         </h1>
         {client?.company_name && (
-          <p className="text-muted-foreground mt-1">{client.company_name}</p>
+          <p className="text-muted-foreground mt-1 font-medium">{client.company_name}</p>
         )}
       </div>
 
@@ -86,7 +86,7 @@ const PortalDashboard = () => {
           <div className="absolute -top-1 -left-1 w-4 h-4 border-l-2 border-t-2 border-primary/40" />
           <div className="absolute -top-1 -right-1 w-4 h-4 border-r-2 border-t-2 border-primary/40" />
           <div className="flex items-start justify-between mb-3">
-            <p className="text-xs text-muted-foreground uppercase tracking-widest">Account Balance</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Account Balance</p>
             <TrendingUp className="h-4 w-4 text-primary/60" />
           </div>
           <p
@@ -103,13 +103,13 @@ const PortalDashboard = () => {
           <div className="absolute -top-1 -left-1 w-4 h-4 border-l-2 border-t-2 border-primary/40" />
           <div className="absolute -top-1 -right-1 w-4 h-4 border-r-2 border-t-2 border-primary/40" />
           <div className="flex items-start justify-between mb-3">
-            <p className="text-xs text-muted-foreground uppercase tracking-widest">Outstanding</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">Outstanding</p>
             <AlertCircle className="h-4 w-4 text-red-500/60" />
           </div>
           <p className="font-display text-3xl font-medium text-red-500">
             {formatCurrency(outstanding)}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1 font-medium">
             {unpaidInvoices} unpaid invoice{unpaidInvoices !== 1 ? "s" : ""}
           </p>
         </div>
@@ -137,7 +137,7 @@ const PortalDashboard = () => {
 
       {/* Quick links */}
       <div>
-        <h2 className="font-display text-lg text-foreground mb-4">Quick Access</h2>
+        <h2 className="font-display text-lg font-bold text-foreground mb-4">Quick Access</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickLinks.map(({ label, path, icon: Icon, desc }) => (
             <Link
@@ -150,8 +150,8 @@ const PortalDashboard = () => {
               <div className="absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <Icon className="h-6 w-6 text-primary mb-3" />
-              <p className="font-medium text-foreground text-sm">{label}</p>
-              <p className="text-xs text-muted-foreground mt-1">{desc}</p>
+              <p className="font-semibold text-foreground text-sm">{label}</p>
+              <p className="text-xs text-muted-foreground mt-1 font-medium">{desc}</p>
             </Link>
           ))}
         </div>

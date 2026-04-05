@@ -35,10 +35,10 @@ const AdminDashboard = () => {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-2">
           <div className="h-1 w-1 rounded-full bg-primary" />
-          <span className="text-xs font-medium text-primary tracking-wider uppercase">Overview</span>
+          <span className="text-xs font-semibold text-primary tracking-wider uppercase">Overview</span>
         </div>
         <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
+        <p className="text-muted-foreground mt-1 text-sm font-medium">
           Manage clients, track vehicles, and monitor operations.
         </p>
       </div>
@@ -50,13 +50,13 @@ const AdminDashboard = () => {
             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <Users className="h-5 w-5 text-primary" />
             </div>
-            <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
+            <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
               <TrendingUp className="h-3 w-3" />
               <span>Active</span>
             </div>
           </div>
           <p className="text-3xl font-bold text-foreground mb-1">{clients.length}</p>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Clients</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Clients</p>
         </div>
 
         <div className="bg-card rounded-xl p-6 border border-border/50 card-shadow hover:card-shadow-hover transition-all duration-300">
@@ -66,7 +66,7 @@ const AdminDashboard = () => {
             </div>
           </div>
           <p className="text-3xl font-bold text-foreground mb-1">{vehicles.length}</p>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Vehicles</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Vehicles</p>
         </div>
 
         {STATUS_ORDER.slice(0, 2).map((s) => (
@@ -78,7 +78,7 @@ const AdminDashboard = () => {
               <span className="text-lg">🚗</span>
             </div>
             <p className="text-3xl font-bold text-foreground mb-1">{statusCounts[s] ?? 0}</p>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
               {VEHICLE_STATUS_LABELS[s]}
             </p>
           </div>
@@ -89,7 +89,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Stock by Status */}
         <div className="bg-card rounded-xl p-6 border border-border/50 card-shadow">
-          <h2 className="text-lg font-semibold text-foreground mb-6">Stock by Status</h2>
+          <h2 className="text-lg font-bold text-foreground mb-6">Stock by Status</h2>
           <div className="space-y-5">
             {STATUS_ORDER.map((s) => {
               const count = statusCounts[s] ?? 0;
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
               return (
                 <div key={s}>
                   <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-foreground font-medium">
+                    <span className="text-foreground font-semibold">
                       {VEHICLE_STATUS_LABELS[s]}
                     </span>
                     <span className="text-muted-foreground">
@@ -119,7 +119,7 @@ const AdminDashboard = () => {
         {/* Recent Vehicles */}
         <div className="bg-card rounded-xl p-6 border border-border/50 card-shadow">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-foreground">Recent Vehicles</h2>
+            <h2 className="text-lg font-bold text-foreground">Recent Vehicles</h2>
             <Link
               to="/admin/vehicles"
               className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
@@ -140,7 +140,7 @@ const AdminDashboard = () => {
                   className="flex items-center justify-between py-3 px-3 rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{v.name}</p>
+                    <p className="text-sm font-semibold text-foreground truncate">{v.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {v.clients?.company_name} · {format(new Date(v.created_at), "MMM d")}
                     </p>
@@ -158,7 +158,7 @@ const AdminDashboard = () => {
       {/* Recent Clients */}
       <div className="bg-card rounded-xl p-6 border border-border/50 card-shadow">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-foreground">Recent Clients</h2>
+          <h2 className="text-lg font-bold text-foreground">Recent Clients</h2>
           <Link
             to="/admin/clients"
             className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
@@ -186,7 +186,7 @@ const AdminDashboard = () => {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
+                    <p className="text-sm font-semibold text-foreground truncate">
                       {c.company_name}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">

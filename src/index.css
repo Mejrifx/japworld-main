@@ -8,22 +8,22 @@
   :root {
     /* Light Mode - Apple Professional */
     --background: 0 0% 98%;
-    --foreground: 0 0% 13%;
+    --foreground: 0 0% 5%;          /* Pure black for better readability */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card-foreground: 0 0% 5%;     /* Pure black */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover-foreground: 0 0% 5%;
 
     --primary: 217 91% 60%;        /* Deep blue for light mode */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 13%;
+    --secondary-foreground: 0 0% 5%;
 
     --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted-foreground: 0 0% 40%;   /* Darker gray for secondary text */
 
     --accent: 217 91% 95%;
     --accent-foreground: 217 91% 40%;
@@ -42,11 +42,11 @@
     --glass-border: 0 0% 88%;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 13%;
+    --sidebar-foreground: 0 0% 5%;
     --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 97%;
-    --sidebar-accent-foreground: 0 0% 13%;
+    --sidebar-accent-foreground: 0 0% 5%;
     --sidebar-border: 0 0% 91%;
     --sidebar-ring: 217 91% 60%;
   }

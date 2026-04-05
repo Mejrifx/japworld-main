@@ -148,10 +148,10 @@ const AdminClients = () => {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <div className="h-1 w-1 rounded-full bg-primary" />
-            <span className="text-xs font-medium text-primary tracking-wider uppercase">Management</span>
+            <span className="text-xs font-semibold text-primary tracking-wider uppercase">Management</span>
           </div>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Clients</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
+          <p className="text-muted-foreground mt-1 text-sm font-medium">
             Manage client accounts and portal access.
           </p>
         </div>
@@ -172,7 +172,7 @@ const AdminClients = () => {
               <div className="h-12 w-12 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="h-6 w-6 text-destructive" />
               </div>
-              <h2 className="text-xl font-semibold text-foreground">Delete Client</h2>
+              <h2 className="text-xl font-bold text-foreground">Delete Client</h2>
             </div>
 
             <div className="space-y-4">
@@ -244,19 +244,19 @@ const AdminClients = () => {
             {createdLogin ? (
               // Success state: show credentials
               <div className="space-y-4">
-                <h2 className="font-display text-xl text-foreground">Client Created Successfully</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="font-display text-xl font-bold text-foreground">Client Created Successfully</h2>
+                <p className="text-sm text-muted-foreground font-medium">
                   The client record and portal login have been created. Share these credentials with the client:
                 </p>
 
                 <div className="border-shoji bg-primary/5 p-4 space-y-3">
                   <div>
-                    <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Email</p>
-                    <p className="text-foreground font-medium">{createdLogin.email}</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1.5">Email</p>
+                    <p className="text-foreground font-semibold">{createdLogin.email}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Temporary Password</p>
-                    <p className="text-foreground font-medium font-mono text-sm">{createdLogin.password}</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1.5">Temporary Password</p>
+                    <p className="text-foreground font-semibold font-mono text-sm">{createdLogin.password}</p>
                   </div>
                 </div>
 
@@ -283,7 +283,7 @@ const AdminClients = () => {
             ) : (
               // Create form
               <>
-                <h2 className="font-display text-xl text-foreground mb-6">Create New Client</h2>
+                <h2 className="text-xl font-bold text-foreground mb-6">Create New Client</h2>
 
                 <form onSubmit={handleCreate} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -417,7 +417,7 @@ const AdminClients = () => {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground text-sm">{c.company_name}</p>
+                  <p className="font-semibold text-foreground text-sm">{c.company_name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {c.contact_name} · {c.email}
                     {c.phone && ` · ${c.phone}`}
