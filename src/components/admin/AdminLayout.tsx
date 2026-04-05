@@ -116,10 +116,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                         className="fixed inset-0 z-40" 
                         onClick={() => setUserMenuOpen(false)}
                       />
-                      <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-border/50 py-2 z-50">
+                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-border/50 py-2 z-50">
                         <div className="px-4 py-3 border-b border-border/50">
-                          <p className="text-sm font-medium text-foreground">{user?.email}</p>
-                          <p className="text-xs text-muted-foreground mt-1">Administrator</p>
+                          <p className="text-sm font-semibold text-foreground truncate">{user?.email}</p>
+                          <p className="text-xs text-muted-foreground mt-1 font-medium">Administrator</p>
                         </div>
                         <button
                           onClick={handleSignOut}
@@ -179,8 +179,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                 </div>
                 <div className="mt-4 pt-4 border-t border-border/50">
                   <div className="px-4 py-2 mb-2">
-                    <p className="text-sm font-medium text-foreground">{user?.email}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Administrator</p>
+                    <p className="text-sm font-semibold text-foreground truncate">{user?.email}</p>
+                    <p className="text-xs text-muted-foreground mt-1 font-medium">Administrator</p>
                   </div>
                   <button
                     onClick={handleSignOut}

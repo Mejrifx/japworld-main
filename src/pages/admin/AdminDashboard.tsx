@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Users, Car, ChevronRight, TrendingUp } from "lucide-react";
+import { Users, Car, ChevronRight, TrendingUp, Warehouse, Clock, Package, Ship } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {
   useAllClients,
@@ -11,6 +11,14 @@ import type { VehicleStatus } from "@/lib/database.types";
 import { format } from "date-fns";
 
 const STATUS_ORDER: VehicleStatus[] = ["in_yard", "waiting_booking", "loaded", "on_ship"];
+
+// Icon mapping for vehicle statuses
+const STATUS_ICONS: Record<VehicleStatus, typeof Warehouse> = {
+  in_yard: Warehouse,
+  waiting_booking: Clock,
+  loaded: Package,
+  on_ship: Ship,
+};
 
 const AdminDashboard = () => {
   const { data: clients = [] } = useAllClients();
@@ -69,20 +77,23 @@ const AdminDashboard = () => {
           <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Vehicles</p>
         </div>
 
-        {STATUS_ORDER.slice(0, 2).map((s) => (
-          <div
-            key={s}
-            className="bg-card rounded-xl p-6 border border-border/50 card-shadow hover:card-shadow-hover transition-all duration-300"
-          >
-            <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center mb-4">
-              <span className="text-lg">🚗</span>
+        {STATUS_ORDER.slice(0, 2).map((s) => {
+          const StatusIcon = STATUS_ICONS[s];
+          return (
+            <div
+              key={s}
+              className="bg-card rounded-xl p-6 border border-border/50 card-shadow hover:card-shadow-hover transition-all duration-300"
+            >
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <StatusIcon className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-3xl font-bold text-foreground mb-1">{statusCounts[s] ?? 0}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                {VEHICLE_STATUS_LABELS[s]}
+              </p>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-1">{statusCounts[s] ?? 0}</p>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-              {VEHICLE_STATUS_LABELS[s]}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Content Grid */}
