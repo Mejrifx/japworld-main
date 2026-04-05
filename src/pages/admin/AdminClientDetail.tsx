@@ -387,14 +387,33 @@ const AdminClientDetail = () => {
     }
     setLoginLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { role: "client", client_id: id },
-        },
-      });
-      if (error) throw error;
+      // Use Edge Function to create user without affecting admin session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-client-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            clientId: id,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create client login");
+      }
+
       setLoginSuccess(true);
       setLoginForm({ email: "", password: "" });
       qc.invalidateQueries({ queryKey: ["admin_profile_by_client", id] });

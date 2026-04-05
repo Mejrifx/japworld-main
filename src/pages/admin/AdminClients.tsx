@@ -58,22 +58,31 @@ const AdminClients = () => {
       // Step 1: Create the client record
       const newClient = await createClient.mutateAsync(form);
 
-      // Step 2: Create the Supabase auth user with the temp password
-      // Note: Email confirmation is disabled in Supabase, so user can log in immediately
-      const { error: authError } = await supabase.auth.signUp({
-        email: form.email,
-        password: tempPassword,
-        options: {
-          data: { role: "client", client_id: newClient.id },
-        },
-      });
+      // Step 2: Create the auth user via Edge Function (doesn't affect admin session)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("Not authenticated");
+      }
 
-      if (authError) {
-        // Auth creation failed - client record exists but no login
-        setFormError(
-          `Client created, but login creation failed: ${authError.message}. You can create the login manually from the client's detail page.`
-        );
-        return;
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-client-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            email: form.email,
+            password: tempPassword,
+            clientId: newClient.id,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create client login");
       }
 
       // Success! Show the credentials
