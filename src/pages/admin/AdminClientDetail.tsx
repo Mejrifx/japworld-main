@@ -469,7 +469,7 @@ const AdminClientDetail = () => {
             </div>
             <div className="text-right">
               <p className="text-xs text-muted-foreground uppercase tracking-widest">Outstanding</p>
-              <p className="font-display text-2xl text-amber-400">{formatCurrency(outstanding)}</p>
+              <p className="font-display text-2xl text-red-500">{formatCurrency(outstanding)}</p>
             </div>
           </div>
         </div>

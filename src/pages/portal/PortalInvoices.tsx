@@ -33,7 +33,7 @@ const PortalInvoices = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div className="border-shoji bg-card/40 p-5">
           <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Outstanding</p>
-          <p className="font-display text-2xl text-amber-400">{formatCurrency(outstanding)}</p>
+          <p className="font-display text-2xl text-red-500">{formatCurrency(outstanding)}</p>
           <p className="text-xs text-muted-foreground mt-1">{unpaid} unpaid invoices</p>
         </div>
         <div className="border-shoji bg-card/40 p-5">

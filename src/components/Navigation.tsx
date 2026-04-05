@@ -13,6 +13,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, LogIn, LayoutDashboard, ShieldCheck } from "lucide-react";
 import japworldLogo from "@/assets/japworld-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navLinks = [
   { label: "About Us", path: "/about" },
@@ -132,8 +133,10 @@ const Navigation = () => {
                 );
               })}
 
-              {/* Portal / Login button */}
-              <div className="ml-2 pl-2 border-l border-border/40">
+              {/* Theme toggle + Portal / Login button */}
+              <div className="ml-2 pl-2 border-l border-border/40 flex items-center gap-2">
+                <ThemeToggle />
+                
                 {user && role === "admin" ? (
                   <Link
                     to="/admin"
@@ -224,22 +227,25 @@ const Navigation = () => {
         {/* Close Button */}
         <div className="flex items-center justify-between p-4 border-b border-border/50">
           <span className="text-primary/40 text-sm font-display">メニュー</span>
-          <button
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="
-              relative
-              p-2
-              border-shoji
-              bg-card/30 hover:bg-card/50
-              text-foreground hover:text-primary
-              transition-all duration-300
-              group
-              active:scale-[0.98]
-            "
-            aria-label="Close menu"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="
+                relative
+                p-2
+                border-shoji
+                bg-card/30 hover:bg-card/50
+                text-foreground hover:text-primary
+                transition-all duration-300
+                group
+                active:scale-[0.98]
+              "
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Navigation Links - Center Aligned */}

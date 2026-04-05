@@ -164,7 +164,7 @@ const PortalAccount = () => {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Outstanding</span>
-                <span className="text-amber-400">{formatCurrency(outstanding)}</span>
+                <span className="text-red-500">{formatCurrency(outstanding)}</span>
               </div>
             </div>
           </div>

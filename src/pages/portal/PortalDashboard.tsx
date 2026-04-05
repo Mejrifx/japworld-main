@@ -104,9 +104,9 @@ const PortalDashboard = () => {
           <div className="absolute -top-1 -right-1 w-4 h-4 border-r-2 border-t-2 border-primary/40" />
           <div className="flex items-start justify-between mb-3">
             <p className="text-xs text-muted-foreground uppercase tracking-widest">Outstanding</p>
-            <AlertCircle className="h-4 w-4 text-amber-400/60" />
+            <AlertCircle className="h-4 w-4 text-red-500/60" />
           </div>
-          <p className="font-display text-3xl font-medium text-amber-400">
+          <p className="font-display text-3xl font-medium text-red-500">
             {formatCurrency(outstanding)}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
