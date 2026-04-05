@@ -16,6 +16,7 @@ import {
 import japworldLogo from "@/assets/japworld-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMyClient } from "@/hooks/usePortalData";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { label: "Dashboard", path: "/portal", icon: LayoutDashboard },
@@ -96,8 +97,11 @@ const PortalLayout = ({ children }: PortalLayoutProps) => {
                 })}
               </div>
 
-              {/* Right side - User menu */}
+              {/* Right side - Theme toggle + User menu */}
               <div className="flex items-center gap-2">
+                {/* Theme toggle */}
+                <ThemeToggle />
+                
                 {/* Desktop user menu */}
                 <div className="hidden md:block relative">
                   <button

@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* Apple Vision Pro - Light & Clean */
+    /* Light Mode - Apple Professional */
     --background: 0 0% 98%;
     --foreground: 0 0% 13%;
 
@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 13%;
 
-    --primary: 40 92% 50%;
+    --primary: 217 91% 60%;        /* Deep blue for light mode */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 96%;
@@ -25,72 +25,74 @@
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 40 92% 95%;
-    --accent-foreground: 40 92% 40%;
+    --accent: 217 91% 95%;
+    --accent-foreground: 217 91% 40%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 91%;
     --input: 0 0% 96%;
-    --ring: 40 92% 50%;
+    --ring: 217 91% 60%;
 
     --radius: 0.75rem;
 
-    /* Custom theme colors */
-    --sakura: 350 80% 85%;
-    --sunset-gold: 40 92% 50%;
+    /* Custom theme colors for light */
     --glass-background: 0 0% 100%;
     --glass-border: 0 0% 88%;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 13%;
-    --sidebar-primary: 40 92% 50%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 97%;
     --sidebar-accent-foreground: 0 0% 13%;
     --sidebar-border: 0 0% 91%;
-    --sidebar-ring: 40 92% 50%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   .dark {
-    /* Keep light theme consistent - no dark mode for now */
-    --background: 0 0% 98%;
-    --foreground: 0 0% 13%;
+    /* Dark Mode - Warm Luxury (Original) */
+    --background: 30 10% 12%;
+    --foreground: 45 30% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card: 30 10% 16%;
+    --card-foreground: 45 30% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover: 30 10% 16%;
+    --popover-foreground: 45 30% 95%;
 
-    --primary: 40 92% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 40 92% 60%;         /* Gold for dark mode */
+    --primary-foreground: 0 0% 5%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 13%;
+    --secondary: 350 60% 75%;
+    --secondary-foreground: 0 0% 5%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 30 8% 20%;
+    --muted-foreground: 45 20% 70%;
 
-    --accent: 40 92% 95%;
-    --accent-foreground: 40 92% 40%;
+    --accent: 350 80% 85%;
+    --accent-foreground: 0 0% 5%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 0 0% 91%;
-    --input: 0 0% 96%;
-    --ring: 40 92% 50%;
+    --border: 30 15% 22%;
+    --input: 30 15% 22%;
+    --ring: 40 92% 60%;
     
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 13%;
-    --sidebar-primary: 40 92% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 97%;
-    --sidebar-accent-foreground: 0 0% 13%;
-    --sidebar-border: 0 0% 91%;
-    --sidebar-ring: 40 92% 50%;
+    /* Custom theme colors for dark */
+    --glass-background: 30 10% 14%;
+    --glass-border: 30 15% 25%;
+    
+    --sidebar-background: 30 10% 10%;
+    --sidebar-foreground: 45 30% 95%;
+    --sidebar-primary: 40 92% 60%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 30 8% 18%;
+    --sidebar-accent-foreground: 45 30% 95%;
+    --sidebar-border: 30 15% 22%;
+    --sidebar-ring: 40 92% 60%;
   }
 }
 
@@ -146,12 +148,24 @@
     );
   }
   
-  /* Glass morphism for floating nav */
+  /* Glass morphism for floating nav - adapts to theme */
   .glass-nav {
-    background: rgba(255, 255, 255, 0.85);
+    background: hsl(var(--glass-background) / 0.85);
     backdrop-filter: blur(12px) saturate(180%);
     -webkit-backdrop-filter: blur(12px) saturate(180%);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid hsl(var(--glass-border) / 0.5);
+    transition: background 0.3s ease, border 0.3s ease;
+  }
+
+  .dark .glass-nav {
+    background: hsl(var(--glass-background) / 0.7);
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 8px 32px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .light .glass-nav {
     box-shadow: 
       0 1px 3px rgba(0, 0, 0, 0.04),
       0 8px 32px rgba(0, 0, 0, 0.02),
@@ -165,15 +179,27 @@
       0 1px 2px rgba(0, 0, 0, 0.02);
   }
 
+  .dark .card-shadow {
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.4),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
   .card-shadow-hover {
     box-shadow: 
       0 4px 6px rgba(0, 0, 0, 0.05),
       0 2px 4px rgba(0, 0, 0, 0.03);
   }
 
+  .dark .card-shadow-hover {
+    box-shadow: 
+      0 4px 6px rgba(0, 0, 0, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
   /* Premium button gradient */
   .btn-gradient-gold {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(40 95% 45%) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.9) 100%);
   }
   
   /* Mobile-optimized background positioning */
