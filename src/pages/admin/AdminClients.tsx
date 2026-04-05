@@ -134,14 +134,21 @@ const AdminClients = () => {
 
   return (
     <AdminLayout>
-      <div className="flex items-start justify-between mb-8">
+      {/* Page header */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
         <div>
-          <p className="text-primary/50 text-xs font-display tracking-widest mb-1">クライアント</p>
-          <h1 className="font-display text-3xl text-foreground">Clients</h1>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-1 w-1 rounded-full bg-primary" />
+            <span className="text-xs font-medium text-primary tracking-wider uppercase">Management</span>
+          </div>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Clients</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Manage client accounts and portal access.
+          </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="relative group flex items-center gap-2 border-shoji bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 text-sm font-medium transition-all duration-200"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
         >
           <Plus className="h-4 w-4" />
           New Client
@@ -150,65 +157,62 @@ const AdminClients = () => {
 
       {/* Delete confirmation modal */}
       {clientToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="relative w-full max-w-md border-shoji bg-card p-8">
-            <div className="absolute -top-2 -left-2 w-5 h-5 border-l-2 border-t-2 border-destructive/60" />
-            <div className="absolute -top-2 -right-2 w-5 h-5 border-r-2 border-t-2 border-destructive/60" />
-            <div className="absolute -bottom-2 -left-2 w-5 h-5 border-l-2 border-b-2 border-destructive/60" />
-            <div className="absolute -bottom-2 -right-2 w-5 h-5 border-r-2 border-b-2 border-destructive/60" />
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-card rounded-2xl p-8 border border-border/50 shadow-2xl">
             <div className="flex items-center gap-3 mb-6">
-              <div className="h-10 w-10 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-destructive" />
+              <div className="h-12 w-12 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="h-6 w-6 text-destructive" />
               </div>
-              <h2 className="font-display text-xl text-foreground">Delete Client Permanently</h2>
+              <h2 className="text-xl font-semibold text-foreground">Delete Client</h2>
             </div>
 
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                This will permanently delete <strong className="text-foreground">{clientToDelete.company_name}</strong> and ALL their data:
+              <p className="text-sm text-foreground">
+                This will permanently delete <strong>{clientToDelete.company_name}</strong> and ALL their data:
               </p>
-              <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 ml-2">
+              <ul className="text-sm text-muted-foreground space-y-1.5 pl-5 list-disc">
                 <li>Client account and login access</li>
                 <li>All invoices and transaction history</li>
-                <li>All vehicles and associated documents (photos, auction sheets)</li>
+                <li>All vehicles and associated documents</li>
                 <li>All files from storage</li>
               </ul>
-              <p className="text-sm text-destructive font-medium">
-                This action cannot be undone.
-              </p>
+              <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
+                <p className="text-sm text-destructive font-medium">
+                  ⚠️ This action cannot be undone.
+                </p>
+              </div>
 
               <form onSubmit={handleDelete} className="space-y-4 pt-2">
                 <div>
-                  <label className="block text-xs text-muted-foreground mb-1.5">
+                  <label className="block text-xs text-muted-foreground mb-2 font-medium">
                     Type <strong>{clientToDelete.company_name}</strong> to confirm
                   </label>
                   <input
                     autoFocus
                     value={deleteConfirmText}
                     onChange={(e) => setDeleteConfirmText(e.target.value)}
-                    className="w-full bg-background/60 border border-destructive/40 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-destructive/60"
+                    className="w-full bg-input border border-border text-foreground px-4 py-2.5 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-destructive/50"
                   />
                 </div>
 
                 {deleteError && (
-                  <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 px-4 py-3">
-                    {deleteError}
-                  </p>
+                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3">
+                    <p className="text-sm text-destructive">{deleteError}</p>
+                  </div>
                 )}
 
-                <div className="flex items-center justify-end gap-3">
+                <div className="flex items-center justify-end gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setClientToDelete(null)}
-                    className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={deleteClient.isPending || deleteConfirmText !== clientToDelete.company_name}
-                    className="border-shoji bg-destructive/10 hover:bg-destructive/20 text-destructive border-destructive/30 px-5 py-2.5 text-sm font-medium transition-all disabled:opacity-50"
+                    className="bg-destructive hover:bg-destructive/90 text-white px-5 py-2.5 text-sm font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deleteClient.isPending ? "Deleting…" : "Permanently Delete"}
                   </button>
@@ -366,61 +370,59 @@ const AdminClients = () => {
 
       {/* Search */}
       <div className="relative mb-6">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <input
           type="text"
           placeholder="Search by company, contact, or email…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-card/40 border border-border/60 text-foreground placeholder-muted-foreground pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+          className="w-full bg-card border border-border text-foreground placeholder-muted-foreground pl-12 pr-4 py-3 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
         />
       </div>
 
       {/* Clients list */}
       {isLoading ? (
-        <div className="flex items-center justify-center h-48">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="flex items-center justify-center h-64">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="border-shoji bg-card/40 p-12 text-center text-muted-foreground">
-          {search ? "No clients match your search." : "No clients yet. Create your first one."}
+        <div className="bg-card border border-border rounded-xl p-12 text-center">
+          <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+          <p className="text-muted-foreground">
+            {search ? "No clients match your search." : "No clients yet. Create your first one."}
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((c) => (
             <div
               key={c.id}
-              className="relative group flex items-center gap-4 border-shoji bg-card/30 hover:bg-card/60 px-5 py-4 transition-all duration-200"
+              className="relative group flex items-center gap-4 bg-card border border-border rounded-xl px-6 py-4 hover:card-shadow-hover transition-all duration-200"
             >
               <Link
                 to={`/admin/clients/${c.id}`}
                 className="flex items-center gap-4 flex-1 min-w-0"
               >
-                <div className="absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                <div className="h-10 w-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Building2 className="h-4 w-4 text-primary" />
+                <div className="h-11 w-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="h-5 w-5 text-primary" />
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground text-sm">{c.company_name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {c.contact_name} &bull; {c.email}
-                    {c.phone && ` • ${c.phone}`}
+                    {c.contact_name} · {c.email}
+                    {c.phone && ` · ${c.phone}`}
                   </p>
                 </div>
               </Link>
 
               <div className="flex items-center gap-3 flex-shrink-0">
                 <span className="text-xs text-muted-foreground hidden sm:block">
-                  Added {format(new Date(c.created_at), "d MMM yyyy")}
+                  {format(new Date(c.created_at), "MMM d")}
                 </span>
                 <Link
                   to={`/admin/clients/${c.id}`}
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-muted-foreground hover:text-primary transition-colors p-1"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Link>
