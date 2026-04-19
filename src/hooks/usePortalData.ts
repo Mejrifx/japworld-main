@@ -366,12 +366,19 @@ export function useCreateInvoice() {
             invoiceData
           );
 
-          // Update invoice with PDF path
+          // Update invoice with PDF path and return updated data
           if (pdfResult.success && pdfResult.storagePath) {
-            await supabase
+            const { data: updatedInvoice } = await supabase
               .from("invoices")
               .update({ pdf_storage_path: pdfResult.storagePath })
-              .eq("id", data.id);
+              .eq("id", data.id)
+              .select()
+              .single();
+            
+            // Return updated invoice with pdf_storage_path
+            if (updatedInvoice) {
+              return updatedInvoice;
+            }
           }
         }
       }
