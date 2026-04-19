@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Users, Car, ChevronRight, TrendingUp, Warehouse, Clock, Package, Ship } from "lucide-react";
+import { Users, User, Car, ChevronRight, TrendingUp, Warehouse, Clock, Package, Ship } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {
   useAllClients,
