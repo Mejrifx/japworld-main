@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,93 +6,93 @@
 
 @layer base {
   :root {
-    /* Light Mode - Apple Professional */
-    --background: 0 0% 98%;
-    --foreground: 0 0% 5%;          /* Pure black for better readability */
+    /* Light Mode - Professional B2B Dashboard */
+    --background: 220 18% 97%;          /* Light slate background #F8FAFC */
+    --foreground: 222 47% 11%;          /* Deep navy text #0F172A */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 5%;     /* Pure black */
+    --card: 0 0% 100%;                  /* Pure white cards */
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 5%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 217 91% 60%;        /* Deep blue for light mode */
+    --primary: 199 89% 48%;             /* Professional blue #0369A1 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 5%;
+    --secondary: 215 25% 27%;           /* Slate #334155 */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;   /* Darker gray for secondary text */
+    --muted: 220 13% 95%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 217 91% 95%;
-    --accent-foreground: 217 91% 40%;
+    --accent: 199 89% 95%;
+    --accent-foreground: 199 89% 35%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 91%;
-    --input: 0 0% 96%;
-    --ring: 217 91% 60%;
+    --border: 220 13% 91%;
+    --input: 220 13% 95%;
+    --ring: 199 89% 48%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Custom theme colors for light */
+    /* Professional admin theme colors */
     --glass-background: 0 0% 100%;
-    --glass-border: 0 0% 88%;
+    --glass-border: 220 13% 88%;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 5%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 199 89% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 97%;
-    --sidebar-accent-foreground: 0 0% 5%;
-    --sidebar-border: 0 0% 91%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-accent: 215 25% 20%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 25% 27%;
+    --sidebar-ring: 199 89% 48%;
   }
 
   .dark {
-    /* Dark Mode - Warm Luxury (Original) */
-    --background: 30 10% 12%;
-    --foreground: 45 30% 95%;
+    /* Dark Mode - Professional Dashboard */
+    --background: 222 47% 11%;          /* Deep navy #0F172A */
+    --foreground: 220 18% 97%;
 
-    --card: 30 10% 16%;
-    --card-foreground: 45 30% 95%;
+    --card: 215 25% 16%;                /* Dark slate cards */
+    --card-foreground: 220 18% 97%;
 
-    --popover: 30 10% 16%;
-    --popover-foreground: 45 30% 95%;
+    --popover: 215 25% 16%;
+    --popover-foreground: 220 18% 97%;
 
-    --primary: 40 92% 60%;         /* Gold for dark mode */
-    --primary-foreground: 0 0% 5%;
+    --primary: 199 89% 48%;             /* Blue stays consistent */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 350 60% 75%;
-    --secondary-foreground: 0 0% 5%;
+    --secondary: 215 25% 27%;           /* Slate */
+    --secondary-foreground: 220 18% 97%;
 
-    --muted: 30 8% 20%;
-    --muted-foreground: 45 20% 70%;
+    --muted: 215 25% 20%;
+    --muted-foreground: 215 16% 65%;
 
-    --accent: 350 80% 85%;
-    --accent-foreground: 0 0% 5%;
+    --accent: 199 89% 25%;
+    --accent-foreground: 199 89% 95%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 30 15% 22%;
-    --input: 30 15% 22%;
-    --ring: 40 92% 60%;
+    --border: 215 25% 27%;
+    --input: 215 25% 20%;
+    --ring: 199 89% 48%;
     
-    /* Custom theme colors for dark */
-    --glass-background: 30 10% 14%;
-    --glass-border: 30 15% 25%;
+    /* Dark theme glass */
+    --glass-background: 222 47% 13%;
+    --glass-border: 215 25% 27%;
     
-    --sidebar-background: 30 10% 10%;
-    --sidebar-foreground: 45 30% 95%;
-    --sidebar-primary: 40 92% 60%;
-    --sidebar-primary-foreground: 0 0% 5%;
-    --sidebar-accent: 30 8% 18%;
-    --sidebar-accent-foreground: 45 30% 95%;
-    --sidebar-border: 30 15% 22%;
-    --sidebar-ring: 40 92% 60%;
+    --sidebar-background: 222 47% 9%;
+    --sidebar-foreground: 220 18% 97%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 25% 18%;
+    --sidebar-accent-foreground: 220 18% 97%;
+    --sidebar-border: 215 25% 27%;
+    --sidebar-ring: 199 89% 48%;
   }
 }
 
@@ -103,7 +103,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     /* Better mobile rendering */
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
@@ -201,6 +201,55 @@
   .btn-gradient-gold {
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.9) 100%);
   }
+
+  /* Professional metric card with subtle hover lift */
+  .metric-card {
+    @apply bg-card rounded-xl p-6 border border-border transition-all duration-300;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .dark .metric-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .metric-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Professional table styling */
+  .admin-table {
+    @apply w-full text-sm;
+  }
+
+  .admin-table thead {
+    @apply border-b-2 border-border bg-muted/30;
+  }
+
+  .admin-table th {
+    @apply px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider;
+  }
+
+  .admin-table td {
+    @apply px-6 py-4 border-b border-border/50;
+  }
+
+  .admin-table tbody tr {
+    @apply transition-colors duration-150 hover:bg-muted/30 cursor-pointer;
+  }
+
+  /* Status badges */
+  .status-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200;
+  }
+
+  .status-badge:hover {
+    transform: scale(1.05);
+  }
   
   /* Mobile-optimized background positioning */
   @media (max-width: 640px) {
@@ -242,47 +291,6 @@
       transform: translateY(0);
     }
   }
-  
-  /* Mobile-optimized slide animation */
-  @media (max-width: 640px) {
-    @keyframes slide-up-fade {
-      0% {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  }
-
-  @keyframes fade-in-delayed {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes pulse-subtle {
-    0%, 100% {
-      opacity: 0.8;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: -200% center;
-    }
-    100% {
-      background-position: 200% center;
-    }
-  }
 
   @keyframes fade-in {
     0% {
@@ -293,61 +301,59 @@
     }
   }
 
+  @keyframes metric-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes slide-in-right {
+    0% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
   .animate-fade-in {
-    animation: fade-in 0.6s ease-out forwards;
+    animation: fade-in 0.4s ease-out forwards;
   }
 
   .animate-slide-up-fade {
-    animation: slide-up-fade 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  
-  /* Faster animation on mobile for better performance */
-  @media (max-width: 640px) {
-    .animate-slide-up-fade {
-      animation: slide-up-fade 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
+    animation: slide-up-fade 0.6s ease-out forwards;
   }
 
-  .animate-fade-in-delayed {
-    animation: fade-in-delayed 1s ease-out 0.8s forwards;
-    opacity: 0;
-  }
-  
-  @media (max-width: 640px) {
-    .animate-fade-in-delayed {
-      animation: fade-in-delayed 0.8s ease-out 0.6s forwards;
-      opacity: 0;
-    }
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s ease-out forwards;
   }
 
-  .animate-pulse-subtle {
-    animation: pulse-subtle 3s ease-in-out infinite;
-  }
-
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      hsl(var(--muted-foreground)) 0%,
-      hsl(var(--primary)) 50%,
-      hsl(var(--muted-foreground)) 100%
-    );
-    background-size: 200% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmer 3s ease-in-out infinite;
+  .animate-metric-pulse {
+    animation: metric-pulse 2s ease-in-out infinite;
   }
   
-  /* Respect reduced motion preferences */
+  /* Respect user's motion preferences (WCAG AAA) */
   @media (prefers-reduced-motion: reduce) {
     .animate-slide-up-fade,
     .animate-fade-in,
-    .animate-fade-in-delayed,
+    .animate-slide-in-right,
+    .animate-metric-pulse,
     .animate-pulse-subtle,
     .animate-shimmer {
       animation: none;
       opacity: 1;
       transform: none;
+    }
+
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
     }
   }
 }

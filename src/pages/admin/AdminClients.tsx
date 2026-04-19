@@ -146,18 +146,18 @@ const AdminClients = () => {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="h-1 w-1 rounded-full bg-primary" />
-            <span className="text-xs font-semibold text-primary tracking-wider uppercase">Management</span>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-1.5 w-1.5 rounded-full bg-primary animate-metric-pulse" />
+            <span className="text-xs font-semibold text-primary/80 tracking-widest uppercase">Management</span>
           </div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Clients</h1>
-          <p className="text-muted-foreground mt-1 text-sm font-medium">
-            Manage client accounts and portal access.
+          <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">Clients</h1>
+          <p className="text-muted-foreground text-sm">
+            Manage client accounts, portal access, and business relationships.
           </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105"
         >
           <Plus className="h-4 w-4" />
           New Client
@@ -402,42 +402,52 @@ const AdminClients = () => {
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {filtered.map((c) => (
+        <div className="space-y-3 animate-slide-up-fade">
+          {filtered.map((c, index) => (
             <div
               key={c.id}
-              className="relative group flex items-center gap-4 bg-card border border-border rounded-xl px-6 py-4 hover:card-shadow-hover transition-all duration-200"
+              className="relative group flex items-center gap-5 bg-card border border-border rounded-xl px-6 py-5 hover:border-primary/30 hover:shadow-md transition-all duration-200 animate-fade-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
               <Link
                 to={`/admin/clients/${c.id}`}
-                className="flex items-center gap-4 flex-1 min-w-0"
+                className="flex items-center gap-5 flex-1 min-w-0"
               >
-                <div className="h-11 w-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Building2 className="h-5 w-5 text-primary" />
+                <div className="h-14 w-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/15 transition-colors">
+                  <Building2 className="h-6 w-6 text-primary" />
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground text-sm">{c.company_name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {c.contact_name} · {c.email}
-                    {c.phone && ` · ${c.phone}`}
-                  </p>
+                  <p className="font-bold text-foreground text-base mb-1 group-hover:text-primary transition-colors">{c.company_name}</p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="font-medium">{c.contact_name}</span>
+                    <span className="text-border">•</span>
+                    <span>{c.email}</span>
+                    {c.phone && (
+                      <>
+                        <span className="text-border">•</span>
+                        <span>{c.phone}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </Link>
 
-              <div className="flex items-center gap-3 flex-shrink-0">
-                <span className="text-xs text-muted-foreground hidden sm:block">
-                  {format(new Date(c.created_at), "MMM d")}
-                </span>
+              <div className="flex items-center gap-4 flex-shrink-0">
+                <div className="hidden sm:block text-right">
+                  <p className="text-xs font-semibold text-muted-foreground">Joined</p>
+                  <p className="text-sm font-bold text-foreground">{format(new Date(c.created_at), "MMM d, yyyy")}</p>
+                </div>
                 <Link
                   to={`/admin/clients/${c.id}`}
-                  className="text-muted-foreground hover:text-primary transition-colors p-1"
+                  className="h-9 w-9 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center transition-all group/btn"
+                  title="View details"
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform" />
                 </Link>
                 <button
                   onClick={() => openDeleteModal({ id: c.id, company_name: c.company_name })}
-                  className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                  className="h-9 w-9 rounded-lg bg-destructive/10 hover:bg-destructive/20 text-destructive flex items-center justify-center transition-all"
                   title="Delete client permanently"
                 >
                   <Trash2 className="h-4 w-4" />
