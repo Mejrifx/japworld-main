@@ -13,6 +13,9 @@ import {
   Download,
   Eye,
   FileUp,
+  MessageSquare,
+  Clock,
+  Send,
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { ImageGallery } from "@/components/ImageGallery";
@@ -37,6 +40,9 @@ import {
   useUploadVehicleDocument,
   useDeleteVehicleDocument,
   useSignedDocumentUrl,
+  useClientNotes,
+  useCreateClientNote,
+  useDeleteClientNote,
   computeBalance,
   computeOutstanding,
   formatCurrency,
@@ -55,7 +61,7 @@ import type {
 } from "@/lib/database.types";
 import { format } from "date-fns";
 
-type Tab = "account" | "finance" | "invoices" | "vehicles";
+type Tab = "account" | "finance" | "invoices" | "vehicles" | "notes";
 type DocType = DocumentType | "all";
 
 const VEHICLE_STATUSES: VehicleStatus[] = ["in_yard", "waiting_booking", "loaded", "on_ship"];
@@ -374,6 +380,7 @@ const AdminClientDetail = () => {
   const { data: transactions = [] } = useClientTransactions(id);
   const { data: invoices = [] } = useClientInvoices(id);
   const { data: vehicles = [] } = useClientVehicles(id);
+  const { data: notes = [] } = useClientNotes(id);
 
   const updateClient = useUpdateClient();
   const recordPayment = useRecordPayment();
@@ -382,6 +389,8 @@ const AdminClientDetail = () => {
   const deleteInvoice = useDeleteInvoice();
   const uploadCustomPDF = useUploadCustomInvoicePDF();
   const createVehicle = useCreateVehicle();
+  const createNote = useCreateClientNote();
+  const deleteNote = useDeleteClientNote();
   const updateVehicleStatus = useUpdateVehicleStatus();
   const updateVehicle = useUpdateVehicle();
   const deleteVehicle = useDeleteVehicle();
@@ -431,6 +440,10 @@ const AdminClientDetail = () => {
   const [vehicleError, setVehicleError] = useState<string | null>(null);
   const [showVehicleForm, setShowVehicleForm] = useState(false);
 
+  // Notes
+  const [noteText, setNoteText] = useState("");
+  const [noteError, setNoteError] = useState<string | null>(null);
+
   // Create client portal login
   const [loginForm, setLoginForm] = useState<{ email: string; password: string }>({ email: "", password: "" });
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -455,6 +468,7 @@ const AdminClientDetail = () => {
     { key: "finance", label: "Balance & Payments" },
     { key: "invoices", label: "Invoices" },
     { key: "vehicles", label: "Vehicles & Docs" },
+    { key: "notes", label: "Notes & Activity" },
   ];
 
   const handlePayment = async (e: React.FormEvent) => {
@@ -1440,6 +1454,174 @@ const AdminClientDetail = () => {
               >
                 {deleteVehicle.isPending ? "Deleting…" : "Delete Vehicle"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Notes & Activity ── */}
+      {activeTab === "notes" && (
+        <div className="space-y-6">
+          {/* Add Note Form */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <MessageSquare className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-foreground">Add Activity Note</h2>
+                <p className="text-xs text-muted-foreground">Document important client interactions and updates</p>
+              </div>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setNoteError(null);
+
+                if (!noteText.trim()) {
+                  setNoteError("Note cannot be empty");
+                  return;
+                }
+
+                try {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (!user) throw new Error("Not authenticated");
+
+                  await createNote.mutateAsync({
+                    client_id: id!,
+                    created_by: user.id,
+                    note_text: noteText.trim(),
+                  });
+
+                  setNoteText("");
+                } catch (err: unknown) {
+                  setNoteError(err instanceof Error ? err.message : "Failed to add note");
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <textarea
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Enter your note... (e.g., Client called regarding shipment delay, Updated payment terms, etc.)"
+                  rows={4}
+                  className="w-full bg-input border border-border text-foreground placeholder-muted-foreground px-4 py-3 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none transition-all"
+                />
+              </div>
+
+              {noteError && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3">
+                  <p className="text-sm text-destructive">{noteError}</p>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">
+                  {noteText.length}/1000 characters
+                </p>
+                <button
+                  type="submit"
+                  disabled={createNote.isPending || !noteText.trim()}
+                  className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 text-sm font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                >
+                  <Send className="h-4 w-4" />
+                  {createNote.isPending ? "Adding..." : "Add Note"}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Notes List - Activity Log Style */}
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <div className="bg-muted/30 px-6 py-4 border-b border-border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-foreground">Activity Log</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {notes.length} {notes.length === 1 ? "note" : "notes"} recorded
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="divide-y divide-border">
+              {notes.length === 0 ? (
+                <div className="p-12 text-center">
+                  <div className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="h-8 w-8 text-muted-foreground/30" />
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium">No notes yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Add your first note to start tracking client activity
+                  </p>
+                </div>
+              ) : (
+                notes.map((note, index) => (
+                  <div
+                    key={note.id}
+                    className="p-6 hover:bg-muted/10 transition-colors group relative animate-fade-in"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    {/* Timeline indicator */}
+                    {index !== notes.length - 1 && (
+                      <div className="absolute left-[2.25rem] top-16 bottom-0 w-px bg-border" />
+                    )}
+
+                    <div className="flex gap-4">
+                      {/* Timeline dot */}
+                      <div className="relative flex-shrink-0">
+                        <div className="h-9 w-9 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
+                          <Clock className="h-4 w-4 text-primary" />
+                        </div>
+                      </div>
+
+                      {/* Note content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <div className="flex-1">
+                            <p className="text-xs text-muted-foreground font-medium">
+                              {new Date(note.created_at).toLocaleDateString("en-GB", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
+                              {" at "}
+                              {new Date(note.created_at).toLocaleTimeString("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              if (window.confirm("Delete this note?")) {
+                                deleteNote.mutate({ id: note.id, clientId: id! });
+                              }
+                            }}
+                            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all p-1 rounded hover:bg-destructive/10"
+                            title="Delete note"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+
+                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                          {note.note_text}
+                        </p>
+
+                        {note.updated_at !== note.created_at && (
+                          <p className="text-xs text-muted-foreground/70 mt-2 italic">
+                            Edited {new Date(note.updated_at).toLocaleString("en-GB")}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

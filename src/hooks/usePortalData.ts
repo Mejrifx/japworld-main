@@ -723,6 +723,61 @@ export function useDeleteVehicle() {
 }
 
 // ──────────────────────────────────────
+// CLIENT NOTES
+// ──────────────────────────────────────
+
+export type ClientNote = Database["public"]["Tables"]["client_notes"]["Row"];
+export type ClientNoteInsert = Database["public"]["Tables"]["client_notes"]["Insert"];
+
+export function useClientNotes(clientId: string | undefined) {
+  return useQuery({
+    queryKey: ["client_notes", clientId],
+    queryFn: async () => {
+      if (!clientId) return [];
+      const { data, error} = await supabase
+        .from("client_notes")
+        .select("*")
+        .eq("client_id", clientId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as ClientNote[];
+    },
+    enabled: !!clientId,
+  });
+}
+
+export function useCreateClientNote() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (note: ClientNoteInsert) => {
+      const { data, error } = await supabase
+        .from("client_notes")
+        .insert(note)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["client_notes", vars.client_id] });
+    },
+  });
+}
+
+export function useDeleteClientNote() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, clientId }: { id: string; clientId: string }) => {
+      const { error } = await supabase.from("client_notes").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["client_notes", vars.clientId] });
+    },
+  });
+}
+
+// ──────────────────────────────────────
 // HELPERS
 // ──────────────────────────────────────
 

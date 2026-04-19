@@ -233,6 +233,31 @@ export interface Database {
           changed_by?: string | null;
         };
       };
+      client_notes: {
+        Row: {
+          id: string;
+          client_id: string;
+          created_by: string;
+          note_text: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          created_by: string;
+          note_text: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          client_id?: string;
+          created_by?: string;
+          note_text?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: {
