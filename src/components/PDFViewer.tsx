@@ -40,9 +40,9 @@ export function PDFViewer({ pdfUrl, fileName, onClose }: PDFViewerProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-[99999] bg-black/95 backdrop-blur-sm animate-fade-in">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/90 to-transparent">
+      <div className="absolute top-0 left-0 right-0 z-[100] bg-gradient-to-b from-black/90 to-transparent">
         <div className="flex items-center justify-between p-4 sm:p-6">
           <div className="text-white">
             <h3 className="font-semibold text-base sm:text-lg">{fileName}</h3>
@@ -53,8 +53,9 @@ export function PDFViewer({ pdfUrl, fileName, onClose }: PDFViewerProps) {
             {/* Download */}
             <button
               onClick={handleDownload}
-              className="p-2 sm:p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="p-2 sm:p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer relative z-10"
               title="Download PDF"
+              type="button"
             >
               <Download className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
@@ -62,8 +63,9 @@ export function PDFViewer({ pdfUrl, fileName, onClose }: PDFViewerProps) {
             {/* Open in new tab */}
             <button
               onClick={handleOpenInNewTab}
-              className="p-2 sm:p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="p-2 sm:p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer relative z-10"
               title="Open in new tab"
+              type="button"
             >
               <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
@@ -71,8 +73,9 @@ export function PDFViewer({ pdfUrl, fileName, onClose }: PDFViewerProps) {
             {/* Close */}
             <button
               onClick={onClose}
-              className="p-2 sm:p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="p-2 sm:p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer relative z-10"
               title="Close (Esc)"
+              type="button"
             >
               <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
