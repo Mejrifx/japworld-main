@@ -384,6 +384,7 @@ const AdminClientDetail = () => {
   const updateVehicleStatus = useUpdateVehicleStatus();
   const updateVehicle = useUpdateVehicle();
   const deleteVehicle = useDeleteVehicle();
+  const upload = useUploadVehicleDocument();
 
   const [activeTab, setActiveTab] = useState<Tab>("account");
   const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set());
@@ -407,6 +408,7 @@ const AdminClientDetail = () => {
     description: "",
     due_date: "",
     invoice_number: "",
+    vehicle_id: "",
   });
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
@@ -476,7 +478,7 @@ const AdminClientDetail = () => {
     const cents = Math.round(parseFloat(invoiceForm.amount) * 100);
     if (!cents || isNaN(cents)) { setInvoiceError("Enter a valid amount."); return; }
     try {
-      await createInvoice.mutateAsync({
+      const invoice = await createInvoice.mutateAsync({
         client_id: id!,
         amount_cents: cents,
         description: invoiceForm.description,
@@ -489,7 +491,35 @@ const AdminClientDetail = () => {
           email: client.email || undefined,
         } : undefined,
       });
-      setInvoiceForm({ amount: "", description: "", due_date: "", invoice_number: "" });
+      
+      // If a vehicle was selected and PDF was generated, also upload as vehicle document
+      if (invoiceForm.vehicle_id && invoice.pdf_storage_path) {
+        try {
+          const { getInvoicePDFUrl } = await import("@/lib/invoicePDF");
+          const pdfUrl = await getInvoicePDFUrl(invoice.pdf_storage_path);
+          
+          if (pdfUrl) {
+            // Download the PDF blob
+            const response = await fetch(pdfUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `invoice-${invoice.invoice_number || invoice.id}.pdf`, { type: 'application/pdf' });
+            
+            // Upload as vehicle document
+            await upload.mutateAsync({
+              vehicleId: invoiceForm.vehicle_id,
+              clientId: id!,
+              file,
+              documentType: "invoice",
+              displayName: `Invoice ${invoice.invoice_number || invoice.id}`,
+            });
+          }
+        } catch (docErr) {
+          console.error("Failed to upload invoice as vehicle document:", docErr);
+          // Don't fail the whole operation, invoice was created successfully
+        }
+      }
+      
+      setInvoiceForm({ amount: "", description: "", due_date: "", invoice_number: "", vehicle_id: "" });
     } catch (err: unknown) {
       setInvoiceError(err instanceof Error ? err.message : "Failed.");
     }
@@ -1037,6 +1067,24 @@ const AdminClientDetail = () => {
                   className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
                   placeholder="e.g. Vehicle purchase: Toyota Supra JZA80"
                 />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1.5">Link to Vehicle (optional)</label>
+                <select
+                  value={invoiceForm.vehicle_id}
+                  onChange={(e) => setInvoiceForm((f) => ({ ...f, vehicle_id: e.target.value }))}
+                  className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                >
+                  <option value="">No vehicle (general invoice)</option>
+                  {vehicles.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name} {v.chassis && `(${v.chassis})`}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  If selected, invoice PDF will appear in vehicle documents
+                </p>
               </div>
               <div>
                 <label className="block text-xs text-muted-foreground mb-1.5">Due Date</label>
