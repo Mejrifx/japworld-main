@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,6 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import PortalLayout from "@/components/portal/PortalLayout";
+import { ImageGallery } from "@/components/ImageGallery";
 import {
   useVehicle,
   useVehicleDocuments,
@@ -44,6 +45,23 @@ const PortalVehicleDetail = () => {
   const getSignedUrl = useSignedDocumentUrl();
 
   const [activeTab, setActiveTab] = useState<DocumentType | "all">("all");
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
+  const [galleryImages, setGalleryImages] = useState<Array<{ url: string; name: string }> | null>(null);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+
+  // Load signed URLs for photos
+  useEffect(() => {
+    const loadImageUrls = async () => {
+      const photos = documents.filter((d) => d.document_type === "photo");
+      const urls: Record<string, string> = {};
+      for (const photo of photos) {
+        const url = await getSignedUrl(photo.storage_path);
+        if (url) urls[photo.id] = url;
+      }
+      setImageUrls(urls);
+    };
+    loadImageUrls();
+  }, [documents, getSignedUrl]);
 
   const filteredDocs =
     activeTab === "all" ? documents : documents.filter((d) => d.document_type === activeTab);
@@ -55,6 +73,19 @@ const PortalVehicleDetail = () => {
     },
     [getSignedUrl]
   );
+
+  const openGallery = async (photoDoc: typeof documents[0]) => {
+    const photos = documents.filter((d) => d.document_type === "photo");
+    const urls = await Promise.all(
+      photos.map(async (p) => {
+        const url = imageUrls[p.id] || (await getSignedUrl(p.storage_path));
+        return { url: url || "", name: p.display_name };
+      })
+    );
+    const index = photos.findIndex((p) => p.id === photoDoc.id);
+    setGalleryImages(urls);
+    setGalleryIndex(index);
+  };
 
   const STATUS_ORDER: VehicleStatus[] = ["in_yard", "waiting_booking", "loaded", "on_ship"];
 
@@ -148,35 +179,97 @@ const PortalVehicleDetail = () => {
               No documents in this category yet.
             </div>
           ) : (
-            <div className="space-y-2">
-              {filteredDocs.map((doc) => {
-                const Icon = DOC_ICONS[doc.document_type as DocumentType] ?? File;
-                return (
-                  <div
-                    key={doc.id}
-                    className="flex items-center gap-4 border-shoji bg-card/40 hover:bg-card/60 px-5 py-4 transition-all duration-200"
-                  >
-                    <div className="h-10 w-10 rounded bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                      <Icon className="h-4 w-4 text-primary" />
+            <>
+              {/* Photos Grid */}
+              {(activeTab === "all" || activeTab === "photo") &&
+                filteredDocs.filter((d) => d.document_type === "photo").length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3">
+                      Photos ({filteredDocs.filter((d) => d.document_type === "photo").length})
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {filteredDocs
+                        .filter((d) => d.document_type === "photo")
+                        .map((photo) => (
+                          <div
+                            key={photo.id}
+                            className="group relative aspect-square rounded-lg overflow-hidden bg-muted border border-border/50 cursor-pointer"
+                            onClick={() => openGallery(photo)}
+                          >
+                            {imageUrls[photo.id] ? (
+                              <img
+                                src={imageUrls[photo.id]}
+                                alt={photo.display_name}
+                                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                              </div>
+                            )}
+
+                            {/* Overlay on hover */}
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <div className="text-white text-center px-2">
+                                <ExternalLink className="h-6 w-6 mx-auto mb-1" />
+                                <p className="text-xs">View</p>
+                              </div>
+                            </div>
+
+                            {/* File name */}
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <p className="text-xs text-white truncate">{photo.display_name}</p>
+                            </div>
+                          </div>
+                        ))}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-foreground truncate">{doc.display_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {doc.document_type.replace("_", " ")} &bull;{" "}
-                        {format(new Date(doc.created_at), "d MMM yyyy")}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleOpenDoc(doc.storage_path)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-primary hover:bg-primary/10 border border-primary/20 transition-all duration-200 flex-shrink-0"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      Open
-                    </button>
                   </div>
-                );
-              })}
-            </div>
+                )}
+
+              {/* Other Documents List */}
+              {filteredDocs.filter((d) => d.document_type !== "photo").length > 0 && (
+                <div>
+                  {(activeTab === "all" || activeTab === "photo") && (
+                    <h4 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3">
+                      Documents ({filteredDocs.filter((d) => d.document_type !== "photo").length})
+                    </h4>
+                  )}
+                  <div className="space-y-2">
+                    {filteredDocs
+                      .filter((d) => d.document_type !== "photo")
+                      .map((doc) => {
+                        const Icon = DOC_ICONS[doc.document_type as DocumentType] ?? File;
+                        return (
+                          <div
+                            key={doc.id}
+                            className="flex items-center gap-4 border-shoji bg-card/40 hover:bg-card/60 px-5 py-4 transition-all duration-200"
+                          >
+                            <div className="h-10 w-10 rounded bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                              <Icon className="h-4 w-4 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">
+                                {doc.display_name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {doc.document_type.replace("_", " ")} &bull;{" "}
+                                {format(new Date(doc.created_at), "d MMM yyyy")}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleOpenDoc(doc.storage_path)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 border border-primary/20 transition-all duration-200 flex-shrink-0"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                              Open
+                            </button>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -251,6 +344,15 @@ const PortalVehicleDetail = () => {
           )}
         </div>
       </div>
+
+      {/* Image Gallery Modal */}
+      {galleryImages && (
+        <ImageGallery
+          images={galleryImages}
+          initialIndex={galleryIndex}
+          onClose={() => setGalleryImages(null)}
+        />
+      )}
     </PortalLayout>
   );
 };
