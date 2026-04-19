@@ -4,34 +4,13 @@ import {
   Text,
   View,
   StyleSheet,
-  Image,
-  Font,
 } from "@react-pdf/renderer";
 import { format } from "date-fns";
-
-// Register fonts for better typography
-Font.register({
-  family: "Inter",
-  fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2",
-      fontWeight: 400,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff2",
-      fontWeight: 600,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff2",
-      fontWeight: 700,
-    },
-  ],
-});
 
 const styles = StyleSheet.create({
   page: {
     padding: 40,
-    fontFamily: "Inter",
+    fontFamily: "Helvetica",
     fontSize: 10,
     color: "#1a1a1a",
   },
@@ -53,13 +32,13 @@ const styles = StyleSheet.create({
   },
   companyName: {
     fontSize: 16,
-    fontWeight: 700,
+    fontFamily: "Helvetica-Bold",
     color: "#2c2c2c",
     marginBottom: 5,
   },
   invoiceTitle: {
     fontSize: 28,
-    fontWeight: 700,
+    fontFamily: "Helvetica-Bold",
     color: "#2c2c2c",
     marginBottom: 20,
   },
@@ -77,21 +56,20 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: 3,
-    fontWeight: 600,
+    fontFamily: "Helvetica-Bold",
   },
   detailsValue: {
     fontSize: 10,
     marginBottom: 8,
-    fontWeight: 400,
   },
   detailsValueBold: {
     fontSize: 10,
     marginBottom: 8,
-    fontWeight: 600,
+    fontFamily: "Helvetica-Bold",
   },
   sectionTitle: {
     fontSize: 11,
-    fontWeight: 700,
+    fontFamily: "Helvetica-Bold",
     color: "#2c2c2c",
     marginBottom: 10,
     marginTop: 5,
@@ -104,7 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     padding: 10,
     borderBottom: "2px solid #d4af37",
-    fontWeight: 600,
+    fontFamily: "Helvetica-Bold",
   },
   tableRow: {
     flexDirection: "row",
@@ -134,11 +112,10 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 10,
-    fontWeight: 400,
   },
   totalValue: {
     fontSize: 10,
-    fontWeight: 600,
+    fontFamily: "Helvetica-Bold",
     textAlign: "right",
     minWidth: 100,
   },
@@ -152,12 +129,12 @@ const styles = StyleSheet.create({
   },
   grandTotalLabel: {
     fontSize: 12,
-    fontWeight: 700,
+    fontFamily: "Helvetica-Bold",
     color: "#2c2c2c",
   },
   grandTotalValue: {
     fontSize: 12,
-    fontWeight: 700,
+    fontFamily: "Helvetica-Bold",
     color: "#d4af37",
     textAlign: "right",
     minWidth: 100,
@@ -185,7 +162,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
     fontSize: 11,
-    fontWeight: 600,
+    fontFamily: "Helvetica-Bold",
     color: "#d4af37",
   },
   notes: {
@@ -291,9 +268,9 @@ export const InvoicePDF = ({
         {/* Items Table */}
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableCol1, { fontWeight: 600 }]}>Description</Text>
-            <Text style={[styles.tableCol2, { fontWeight: 600 }]}>Qty</Text>
-            <Text style={[styles.tableCol3, { fontWeight: 600 }]}>Amount</Text>
+            <Text style={styles.tableCol1}>Description</Text>
+            <Text style={styles.tableCol2}>Qty</Text>
+            <Text style={styles.tableCol3}>Amount</Text>
           </View>
           <View style={styles.tableRow}>
             <Text style={styles.tableCol1}>{description}</Text>
@@ -328,7 +305,7 @@ export const InvoicePDF = ({
           <Text style={{ marginBottom: 5 }}>
             Please make payment to the following bank account:
           </Text>
-          <Text style={{ marginBottom: 3, fontWeight: 600 }}>Bank: Lloyds Bank</Text>
+          <Text style={{ marginBottom: 3, fontFamily: "Helvetica-Bold" }}>Bank: Lloyds Bank</Text>
           <Text style={{ marginBottom: 3 }}>Account Name: JapWorld Limited</Text>
           <Text style={{ marginBottom: 3 }}>Sort Code: 30-00-00</Text>
           <Text style={{ marginBottom: 3 }}>Account Number: 12345678</Text>
@@ -340,7 +317,7 @@ export const InvoicePDF = ({
         {/* Notes */}
         {notes && (
           <View style={styles.notes}>
-            <Text style={{ fontWeight: 600, marginBottom: 5 }}>NOTES:</Text>
+            <Text style={{ fontFamily: "Helvetica-Bold", marginBottom: 5 }}>NOTES:</Text>
             <Text>{notes}</Text>
           </View>
         )}
