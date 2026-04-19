@@ -111,6 +111,7 @@ export interface Database {
           status: InvoiceStatus;
           description: string;
           invoice_number: string | null;
+          pdf_storage_path: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -122,6 +123,7 @@ export interface Database {
           status?: InvoiceStatus;
           description: string;
           invoice_number?: string | null;
+          pdf_storage_path?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -133,6 +135,7 @@ export interface Database {
           status?: InvoiceStatus;
           description?: string;
           invoice_number?: string | null;
+          pdf_storage_path?: string | null;
           updated_at?: string;
         };
       };

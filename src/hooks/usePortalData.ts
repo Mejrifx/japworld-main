@@ -325,10 +325,16 @@ export function useRecordPayment() {
 export function useCreateInvoice() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: Database["public"]["Tables"]["invoices"]["Insert"]) => {
-      const { data, error } = await supabase.from("invoices").insert(input).select().single();
+    mutationFn: async (input: Database["public"]["Tables"]["invoices"]["Insert"] & { 
+      clientData?: { company_name: string; contact_name: string; email?: string } 
+    }) => {
+      const { clientData, ...invoiceInput } = input;
+      
+      // Create invoice record first
+      const { data, error } = await supabase.from("invoices").insert(invoiceInput).select().single();
       if (error) throw error;
-      // Also create a debit transaction for the invoice amount
+      
+      // Create debit transaction for the invoice amount
       if (data) {
         await supabase.from("transactions").insert({
           client_id: data.client_id,
@@ -337,6 +343,37 @@ export function useCreateInvoice() {
           description: `Invoice: ${data.description}`,
           invoice_id: data.id,
         });
+
+        // Generate and upload PDF if client data is provided
+        if (clientData) {
+          const { generateAndUploadInvoicePDF } = await import("@/lib/invoicePDF");
+          
+          const invoiceData = {
+            invoiceNumber: data.invoice_number || `INV-${data.id.substring(0, 8).toUpperCase()}`,
+            invoiceDate: new Date(data.created_at),
+            dueDate: data.due_date ? new Date(data.due_date) : null,
+            clientName: clientData.contact_name,
+            clientCompany: clientData.company_name,
+            clientEmail: clientData.email,
+            description: data.description,
+            amount: data.amount_cents / 100, // Convert cents to pounds
+            currency: "GBP",
+          };
+
+          const pdfResult = await generateAndUploadInvoicePDF(
+            data.id,
+            data.client_id,
+            invoiceData
+          );
+
+          // Update invoice with PDF path
+          if (pdfResult.success && pdfResult.storagePath) {
+            await supabase
+              .from("invoices")
+              .update({ pdf_storage_path: pdfResult.storagePath })
+              .eq("id", data.id);
+          }
+        }
       }
       return data;
     },
@@ -606,6 +643,43 @@ export function useDeleteInvoice() {
       qc.invalidateQueries({ queryKey: ["admin_transactions", vars.clientId] });
       qc.invalidateQueries({ queryKey: ["invoices", vars.clientId] });
       qc.invalidateQueries({ queryKey: ["transactions", vars.clientId] });
+    },
+  });
+}
+
+// Upload custom invoice PDF
+export function useUploadCustomInvoicePDF() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      invoiceId,
+      clientId,
+      file,
+    }: {
+      invoiceId: string;
+      clientId: string;
+      file: File;
+    }) => {
+      const { uploadCustomInvoicePDF } = await import("@/lib/invoicePDF");
+      const result = await uploadCustomInvoicePDF(invoiceId, clientId, file);
+      
+      if (!result.success) {
+        throw new Error(result.error || "Failed to upload PDF");
+      }
+
+      // Update invoice with new PDF path
+      const { error } = await supabase
+        .from("invoices")
+        .update({ pdf_storage_path: result.storagePath })
+        .eq("id", invoiceId);
+
+      if (error) throw error;
+      
+      return result;
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ["admin_invoices", vars.clientId] });
+      qc.invalidateQueries({ queryKey: ["invoices", vars.clientId] });
     },
   });
 }

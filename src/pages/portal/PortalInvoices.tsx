@@ -1,4 +1,4 @@
-import { FileText } from "lucide-react";
+import { FileText, Eye } from "lucide-react";
 import PortalLayout from "@/components/portal/PortalLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -8,6 +8,7 @@ import {
   INVOICE_STATUS_LABELS,
   INVOICE_STATUS_COLORS,
 } from "@/hooks/usePortalData";
+import { getInvoicePDFUrl } from "@/lib/invoicePDF";
 import type { InvoiceStatus } from "@/lib/database.types";
 import { format } from "date-fns";
 
@@ -18,6 +19,11 @@ const PortalInvoices = () => {
   const outstanding = computeOutstanding(invoices);
   const paid = invoices.filter((i) => i.status === "paid").length;
   const unpaid = invoices.filter((i) => i.status !== "paid").length;
+
+  const handleViewInvoicePDF = async (storagePath: string) => {
+    const url = await getInvoicePDFUrl(storagePath);
+    if (url) window.open(url, "_blank");
+  };
 
   return (
     <PortalLayout>
@@ -84,6 +90,9 @@ const PortalInvoices = () => {
                   <th className="text-center px-6 py-4 text-xs text-muted-foreground uppercase tracking-widest font-normal">
                     Status
                   </th>
+                  <th className="text-center px-6 py-4 text-xs text-muted-foreground uppercase tracking-widest font-normal">
+                    PDF
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -120,6 +129,20 @@ const PortalInvoices = () => {
                       >
                         {INVOICE_STATUS_LABELS[inv.status as InvoiceStatus]}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {inv.pdf_storage_path ? (
+                        <button
+                          onClick={() => handleViewInvoicePDF(inv.pdf_storage_path!)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 border border-primary/20 transition-all duration-200"
+                          title="View invoice PDF"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">View</span>
+                        </button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </td>
                   </tr>
                 ))}

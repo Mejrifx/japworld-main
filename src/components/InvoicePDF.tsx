@@ -1,0 +1,361 @@
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Font,
+} from "@react-pdf/renderer";
+import { format } from "date-fns";
+
+// Register fonts for better typography
+Font.register({
+  family: "Inter",
+  fonts: [
+    {
+      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2",
+      fontWeight: 400,
+    },
+    {
+      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff2",
+      fontWeight: 600,
+    },
+    {
+      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff2",
+      fontWeight: 700,
+    },
+  ],
+});
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontFamily: "Inter",
+    fontSize: 10,
+    color: "#1a1a1a",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 30,
+    paddingBottom: 20,
+    borderBottom: "2px solid #d4af37",
+  },
+  logo: {
+    width: 120,
+    height: "auto",
+  },
+  companyInfo: {
+    textAlign: "right",
+    fontSize: 9,
+    lineHeight: 1.5,
+  },
+  companyName: {
+    fontSize: 16,
+    fontWeight: 700,
+    color: "#2c2c2c",
+    marginBottom: 5,
+  },
+  invoiceTitle: {
+    fontSize: 28,
+    fontWeight: 700,
+    color: "#2c2c2c",
+    marginBottom: 20,
+  },
+  invoiceDetails: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 30,
+  },
+  detailsBox: {
+    width: "48%",
+  },
+  detailsLabel: {
+    fontSize: 8,
+    color: "#666",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 3,
+    fontWeight: 600,
+  },
+  detailsValue: {
+    fontSize: 10,
+    marginBottom: 8,
+    fontWeight: 400,
+  },
+  detailsValueBold: {
+    fontSize: 10,
+    marginBottom: 8,
+    fontWeight: 600,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: 700,
+    color: "#2c2c2c",
+    marginBottom: 10,
+    marginTop: 5,
+  },
+  table: {
+    marginVertical: 20,
+  },
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#f5f5f5",
+    padding: 10,
+    borderBottom: "2px solid #d4af37",
+    fontWeight: 600,
+  },
+  tableRow: {
+    flexDirection: "row",
+    padding: 12,
+    borderBottom: "1px solid #e5e5e5",
+  },
+  tableCol1: {
+    width: "60%",
+  },
+  tableCol2: {
+    width: "20%",
+    textAlign: "right",
+  },
+  tableCol3: {
+    width: "20%",
+    textAlign: "right",
+  },
+  totalsSection: {
+    marginTop: 20,
+    marginLeft: "50%",
+  },
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+    paddingHorizontal: 10,
+  },
+  totalLabel: {
+    fontSize: 10,
+    fontWeight: 400,
+  },
+  totalValue: {
+    fontSize: 10,
+    fontWeight: 600,
+    textAlign: "right",
+    minWidth: 100,
+  },
+  grandTotalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+    paddingTop: 10,
+    paddingHorizontal: 10,
+    borderTop: "2px solid #d4af37",
+  },
+  grandTotalLabel: {
+    fontSize: 12,
+    fontWeight: 700,
+    color: "#2c2c2c",
+  },
+  grandTotalValue: {
+    fontSize: 12,
+    fontWeight: 700,
+    color: "#d4af37",
+    textAlign: "right",
+    minWidth: 100,
+  },
+  paymentInfo: {
+    marginTop: 30,
+    padding: 15,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 4,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 30,
+    left: 40,
+    right: 40,
+    paddingTop: 15,
+    borderTop: "1px solid #e5e5e5",
+    fontSize: 8,
+    color: "#999",
+    textAlign: "center",
+    lineHeight: 1.5,
+  },
+  thankYou: {
+    marginTop: 30,
+    marginBottom: 10,
+    textAlign: "center",
+    fontSize: 11,
+    fontWeight: 600,
+    color: "#d4af37",
+  },
+  notes: {
+    marginTop: 20,
+    padding: 12,
+    backgroundColor: "#fffef5",
+    borderLeft: "3px solid #d4af37",
+  },
+});
+
+export interface InvoiceData {
+  invoiceNumber: string;
+  invoiceDate: Date;
+  dueDate: Date | null;
+  clientName: string;
+  clientCompany?: string;
+  clientEmail?: string;
+  clientAddress?: string;
+  description: string;
+  amount: number;
+  currency?: string;
+  vatRate?: number;
+  notes?: string;
+}
+
+export const InvoicePDF = ({
+  invoiceNumber,
+  invoiceDate,
+  dueDate,
+  clientName,
+  clientCompany,
+  clientEmail,
+  clientAddress,
+  description,
+  amount,
+  currency = "GBP",
+  vatRate,
+  notes,
+}: InvoiceData) => {
+  const subtotal = vatRate ? amount / (1 + vatRate / 100) : amount;
+  const vatAmount = vatRate ? amount - subtotal : 0;
+  const currencySymbol = currency === "GBP" ? "£" : "$";
+
+  const formatCurrency = (value: number) => {
+    return `${currencySymbol}${value.toFixed(2)}`;
+  };
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.companyName}>JapWorld</Text>
+            <Text style={{ fontSize: 11, color: "#666", marginBottom: 10 }}>
+              Premium Japanese Vehicle Import
+            </Text>
+          </View>
+          <View style={styles.companyInfo}>
+            <Text>JapWorld Limited</Text>
+            <Text>Unit 5, Industrial Estate</Text>
+            <Text>Birmingham, B10 0HF</Text>
+            <Text>United Kingdom</Text>
+            <Text style={{ marginTop: 5 }}>Email: info@japworld.co.uk</Text>
+            <Text>Tel: +44 (0) 121 XXX XXXX</Text>
+            <Text>Web: www.japworld.co.uk</Text>
+          </View>
+        </View>
+
+        {/* Invoice Title */}
+        <Text style={styles.invoiceTitle}>INVOICE</Text>
+
+        {/* Invoice & Client Details */}
+        <View style={styles.invoiceDetails}>
+          {/* Left: Bill To */}
+          <View style={styles.detailsBox}>
+            <Text style={styles.sectionTitle}>BILL TO</Text>
+            <Text style={styles.detailsValueBold}>{clientCompany || clientName}</Text>
+            {clientCompany && <Text style={styles.detailsValue}>{clientName}</Text>}
+            {clientEmail && <Text style={styles.detailsValue}>{clientEmail}</Text>}
+            {clientAddress && <Text style={styles.detailsValue}>{clientAddress}</Text>}
+          </View>
+
+          {/* Right: Invoice Details */}
+          <View style={styles.detailsBox}>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={styles.detailsLabel}>Invoice Number</Text>
+              <Text style={styles.detailsValueBold}>{invoiceNumber}</Text>
+            </View>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={styles.detailsLabel}>Invoice Date</Text>
+              <Text style={styles.detailsValue}>{format(invoiceDate, "dd MMMM yyyy")}</Text>
+            </View>
+            {dueDate && (
+              <View style={{ marginBottom: 8 }}>
+                <Text style={styles.detailsLabel}>Due Date</Text>
+                <Text style={styles.detailsValue}>{format(dueDate, "dd MMMM yyyy")}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* Items Table */}
+        <View style={styles.table}>
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableCol1, { fontWeight: 600 }]}>Description</Text>
+            <Text style={[styles.tableCol2, { fontWeight: 600 }]}>Qty</Text>
+            <Text style={[styles.tableCol3, { fontWeight: 600 }]}>Amount</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCol1}>{description}</Text>
+            <Text style={styles.tableCol2}>1</Text>
+            <Text style={styles.tableCol3}>{formatCurrency(subtotal)}</Text>
+          </View>
+        </View>
+
+        {/* Totals */}
+        <View style={styles.totalsSection}>
+          {vatRate && vatRate > 0 ? (
+            <>
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Subtotal</Text>
+                <Text style={styles.totalValue}>{formatCurrency(subtotal)}</Text>
+              </View>
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>VAT ({vatRate}%)</Text>
+                <Text style={styles.totalValue}>{formatCurrency(vatAmount)}</Text>
+              </View>
+            </>
+          ) : null}
+          <View style={styles.grandTotalRow}>
+            <Text style={styles.grandTotalLabel}>Total Amount Due</Text>
+            <Text style={styles.grandTotalValue}>{formatCurrency(amount)}</Text>
+          </View>
+        </View>
+
+        {/* Payment Information */}
+        <View style={styles.paymentInfo}>
+          <Text style={[styles.sectionTitle, { marginTop: 0 }]}>PAYMENT INFORMATION</Text>
+          <Text style={{ marginBottom: 5 }}>
+            Please make payment to the following bank account:
+          </Text>
+          <Text style={{ marginBottom: 3, fontWeight: 600 }}>Bank: Lloyds Bank</Text>
+          <Text style={{ marginBottom: 3 }}>Account Name: JapWorld Limited</Text>
+          <Text style={{ marginBottom: 3 }}>Sort Code: 30-00-00</Text>
+          <Text style={{ marginBottom: 3 }}>Account Number: 12345678</Text>
+          <Text style={{ marginTop: 8, fontSize: 9, color: "#666" }}>
+            Please include invoice number {invoiceNumber} as payment reference
+          </Text>
+        </View>
+
+        {/* Notes */}
+        {notes && (
+          <View style={styles.notes}>
+            <Text style={{ fontWeight: 600, marginBottom: 5 }}>NOTES:</Text>
+            <Text>{notes}</Text>
+          </View>
+        )}
+
+        {/* Thank You */}
+        <Text style={styles.thankYou}>Thank you for your business!</Text>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text>JapWorld Limited | Company Registration No. 12345678 | VAT No. GB123456789</Text>
+          <Text style={{ marginTop: 3 }}>
+            This invoice is payable within {dueDate ? "the due date specified" : "30 days"}
+          </Text>
+        </View>
+      </Page>
+    </Document>
+  );
+};

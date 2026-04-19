@@ -10,6 +10,9 @@ import {
   Trash2,
   ExternalLink,
   ChevronDown,
+  Download,
+  Eye,
+  FileUp,
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { ImageGallery } from "@/components/ImageGallery";
@@ -25,6 +28,7 @@ import {
   useCreateInvoice,
   useUpdateInvoiceStatus,
   useDeleteInvoice,
+  useUploadCustomInvoicePDF,
   useCreateVehicle,
   useUpdateVehicleStatus,
   useUpdateVehicle,
@@ -40,6 +44,7 @@ import {
   INVOICE_STATUS_LABELS,
   INVOICE_STATUS_COLORS,
 } from "@/hooks/usePortalData";
+import { getInvoicePDFUrl } from "@/lib/invoicePDF";
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import type {
@@ -374,6 +379,7 @@ const AdminClientDetail = () => {
   const createInvoice = useCreateInvoice();
   const updateInvoiceStatus = useUpdateInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
+  const uploadCustomPDF = useUploadCustomInvoicePDF();
   const createVehicle = useCreateVehicle();
   const updateVehicleStatus = useUpdateVehicleStatus();
   const updateVehicle = useUpdateVehicle();
@@ -386,6 +392,8 @@ const AdminClientDetail = () => {
   const [invoiceToDelete, setInvoiceToDelete] = useState<{ id: string; description: string } | null>(null);
   const [vehicleToDelete, setVehicleToDelete] = useState<{ id: string; name: string } | null>(null);
   const [vehicleDocsToDelete, setVehicleDocsToDelete] = useState<{ id: string; storage_path: string }[]>([]);
+  const [uploadingPDFForInvoice, setUploadingPDFForInvoice] = useState<string | null>(null);
+  const invoicePDFFileRef = useRef<HTMLInputElement>(null);
 
   // Finance forms
   const [paymentForm, setPaymentForm] = useState({
@@ -475,10 +483,37 @@ const AdminClientDetail = () => {
         due_date: invoiceForm.due_date || undefined,
         invoice_number: invoiceForm.invoice_number || undefined,
         status: "issued",
+        clientData: client ? {
+          company_name: client.company_name,
+          contact_name: client.contact_name,
+          email: client.email || undefined,
+        } : undefined,
       });
       setInvoiceForm({ amount: "", description: "", due_date: "", invoice_number: "" });
     } catch (err: unknown) {
       setInvoiceError(err instanceof Error ? err.message : "Failed.");
+    }
+  };
+
+  const handleViewInvoicePDF = async (storagePath: string) => {
+    const url = await getInvoicePDFUrl(storagePath);
+    if (url) window.open(url, "_blank");
+  };
+
+  const handleUploadCustomPDF = async (invoiceId: string) => {
+    const file = invoicePDFFileRef.current?.files?.[0];
+    if (!file) return;
+
+    try {
+      await uploadCustomPDF.mutateAsync({
+        invoiceId,
+        clientId: id!,
+        file,
+      });
+      setUploadingPDFForInvoice(null);
+      if (invoicePDFFileRef.current) invoicePDFFileRef.current.value = "";
+    } catch (error) {
+      console.error("Failed to upload custom PDF:", error);
     }
   };
 
@@ -920,13 +955,43 @@ const AdminClientDetail = () => {
                           </select>
                         </td>
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => setInvoiceToDelete({ id: inv.id, description: inv.invoice_number || inv.description })}
-                            className="text-muted-foreground hover:text-destructive transition-colors p-1"
-                            title="Delete invoice"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          <div className="flex items-center gap-2">
+                            {/* View/Download PDF */}
+                            {inv.pdf_storage_path ? (
+                              <button
+                                onClick={() => handleViewInvoicePDF(inv.pdf_storage_path!)}
+                                className="text-primary hover:text-primary/80 transition-colors p-1"
+                                title="View invoice PDF"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </button>
+                            ) : (
+                              <span className="text-muted-foreground/30 p-1" title="No PDF generated">
+                                <Eye className="h-4 w-4" />
+                              </span>
+                            )}
+                            
+                            {/* Upload Custom PDF */}
+                            <button
+                              onClick={() => {
+                                setUploadingPDFForInvoice(inv.id);
+                                setTimeout(() => invoicePDFFileRef.current?.click(), 100);
+                              }}
+                              className="text-muted-foreground hover:text-primary transition-colors p-1"
+                              title="Upload custom PDF"
+                            >
+                              <FileUp className="h-4 w-4" />
+                            </button>
+                            
+                            {/* Delete Invoice */}
+                            <button
+                              onClick={() => setInvoiceToDelete({ id: inv.id, description: inv.invoice_number || inv.description })}
+                              className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                              title="Delete invoice"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1325,6 +1390,19 @@ const AdminClientDetail = () => {
           </div>
         </div>
       )}
+
+      {/* Hidden file input for custom invoice PDF upload */}
+      <input
+        ref={invoicePDFFileRef}
+        type="file"
+        accept="application/pdf"
+        className="hidden"
+        onChange={(e) => {
+          if (uploadingPDFForInvoice && e.target.files?.[0]) {
+            handleUploadCustomPDF(uploadingPDFForInvoice);
+          }
+        }}
+      />
     </AdminLayout>
   );
 };
