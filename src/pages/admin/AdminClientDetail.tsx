@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { ImageGallery } from "@/components/ImageGallery";
+import { PDFViewer } from "@/components/PDFViewer";
 import {
   useClientById,
   useClientTransactions,
@@ -395,6 +396,9 @@ const AdminClientDetail = () => {
   const [vehicleDocsToDelete, setVehicleDocsToDelete] = useState<{ id: string; storage_path: string }[]>([]);
   const [uploadingPDFForInvoice, setUploadingPDFForInvoice] = useState<string | null>(null);
   const invoicePDFFileRef = useRef<HTMLInputElement>(null);
+  
+  // PDF viewer state
+  const [viewingPDF, setViewingPDF] = useState<{ url: string; fileName: string } | null>(null);
 
   // Finance forms
   const [paymentForm, setPaymentForm] = useState({
@@ -525,9 +529,11 @@ const AdminClientDetail = () => {
     }
   };
 
-  const handleViewInvoicePDF = async (storagePath: string) => {
+  const handleViewInvoicePDF = async (storagePath: string, invoiceNumber: string) => {
     const url = await getInvoicePDFUrl(storagePath);
-    if (url) window.open(url, "_blank");
+    if (url) {
+      setViewingPDF({ url, fileName: `Invoice_${invoiceNumber}.pdf` });
+    }
   };
 
   const handleUploadCustomPDF = async (invoiceId: string) => {
@@ -989,7 +995,7 @@ const AdminClientDetail = () => {
                             {/* View/Download PDF */}
                             {inv.pdf_storage_path ? (
                               <button
-                                onClick={() => handleViewInvoicePDF(inv.pdf_storage_path!)}
+                                onClick={() => handleViewInvoicePDF(inv.pdf_storage_path!, inv.invoice_number || 'Invoice')}
                                 className="text-primary hover:text-primary/80 transition-colors p-1"
                                 title="View invoice PDF"
                               >
@@ -1451,6 +1457,15 @@ const AdminClientDetail = () => {
           }
         }}
       />
+
+      {/* PDF Viewer Modal */}
+      {viewingPDF && (
+        <PDFViewer
+          pdfUrl={viewingPDF.url}
+          fileName={viewingPDF.fileName}
+          onClose={() => setViewingPDF(null)}
+        />
+      )}
     </AdminLayout>
   );
 };

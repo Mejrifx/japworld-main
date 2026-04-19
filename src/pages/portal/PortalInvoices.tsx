@@ -1,5 +1,7 @@
 import { FileText, Eye } from "lucide-react";
+import { useState } from "react";
 import PortalLayout from "@/components/portal/PortalLayout";
+import { PDFViewer } from "@/components/PDFViewer";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   useMyInvoices,
@@ -15,14 +17,19 @@ import { format } from "date-fns";
 const PortalInvoices = () => {
   const { clientId } = useAuth();
   const { data: invoices = [], isLoading } = useMyInvoices(clientId);
+  
+  // PDF viewer state
+  const [viewingPDF, setViewingPDF] = useState<{ url: string; fileName: string } | null>(null);
 
   const outstanding = computeOutstanding(invoices);
   const paid = invoices.filter((i) => i.status === "paid").length;
   const unpaid = invoices.filter((i) => i.status !== "paid").length;
 
-  const handleViewInvoicePDF = async (storagePath: string) => {
+  const handleViewInvoicePDF = async (storagePath: string, invoiceNumber: string) => {
     const url = await getInvoicePDFUrl(storagePath);
-    if (url) window.open(url, "_blank");
+    if (url) {
+      setViewingPDF({ url, fileName: `Invoice_${invoiceNumber}.pdf` });
+    }
   };
 
   return (
@@ -133,7 +140,7 @@ const PortalInvoices = () => {
                     <td className="px-6 py-4 text-center">
                       {inv.pdf_storage_path ? (
                         <button
-                          onClick={() => handleViewInvoicePDF(inv.pdf_storage_path!)}
+                          onClick={() => handleViewInvoicePDF(inv.pdf_storage_path!, inv.invoice_number || 'Invoice')}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 border border-primary/20 transition-all duration-200"
                           title="View invoice PDF"
                         >
@@ -151,6 +158,15 @@ const PortalInvoices = () => {
           </div>
         )}
       </div>
+
+      {/* PDF Viewer Modal */}
+      {viewingPDF && (
+        <PDFViewer
+          pdfUrl={viewingPDF.url}
+          fileName={viewingPDF.fileName}
+          onClose={() => setViewingPDF(null)}
+        />
+      )}
     </PortalLayout>
   );
 };
