@@ -401,6 +401,7 @@ const AdminClientDetail = () => {
 
   // Delete confirmations
   const [invoiceToDelete, setInvoiceToDelete] = useState<{ id: string; description: string } | null>(null);
+  const [noteToDelete, setNoteToDelete] = useState<{ id: string; preview: string } | null>(null);
   const [vehicleToDelete, setVehicleToDelete] = useState<{ id: string; name: string } | null>(null);
   const [vehicleDocsToDelete, setVehicleDocsToDelete] = useState<{ id: string; storage_path: string }[]>([]);
   const [uploadingPDFForInvoice, setUploadingPDFForInvoice] = useState<string | null>(null);
@@ -1402,6 +1403,72 @@ const AdminClientDetail = () => {
         </div>
       )}
 
+      {/* ── Delete Note Confirmation Modal ── */}
+      {noteToDelete && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-note-title"
+          onClick={() => setNoteToDelete(null)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-xl border border-border bg-card p-8 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-4 mb-5">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-destructive/10 border border-destructive/20">
+                <Trash2 className="h-6 w-6 text-destructive" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 id="delete-note-title" className="text-xl font-bold text-foreground">
+                  Delete this note?
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  This will permanently remove the entry from the activity log.
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-6 rounded-lg border border-border bg-muted/30 p-4">
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
+                {noteToDelete.preview}
+              </p>
+            </div>
+
+            <p className="text-sm text-destructive mb-6 font-medium">This action cannot be undone.</p>
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
+              <button
+                type="button"
+                onClick={() => setNoteToDelete(null)}
+                className="rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await deleteNote.mutateAsync({
+                      id: noteToDelete.id,
+                      clientId: id!,
+                    });
+                    setNoteToDelete(null);
+                  } catch {
+                    // Error handled by mutation
+                  }
+                }}
+                disabled={deleteNote.isPending}
+                className="rounded-lg bg-destructive px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-destructive/90 disabled:opacity-50"
+              >
+                {deleteNote.isPending ? "Deleting…" : "Delete note"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Delete Vehicle Confirmation Modal ── */}
       {vehicleToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
@@ -1596,11 +1663,16 @@ const AdminClientDetail = () => {
                             </p>
                           </div>
                           <button
-                            onClick={() => {
-                              if (window.confirm("Delete this note?")) {
-                                deleteNote.mutate({ id: note.id, clientId: id! });
-                              }
-                            }}
+                            type="button"
+                            onClick={() =>
+                              setNoteToDelete({
+                                id: note.id,
+                                preview:
+                                  note.note_text.length > 160
+                                    ? `${note.note_text.slice(0, 160)}…`
+                                    : note.note_text,
+                              })
+                            }
                             className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all p-1 rounded hover:bg-destructive/10"
                             title="Delete note"
                           >
