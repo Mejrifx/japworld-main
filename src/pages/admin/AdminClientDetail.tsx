@@ -12,6 +12,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
+import { ImageGallery } from "@/components/ImageGallery";
 import {
   useClientById,
   useClientTransactions,
@@ -112,26 +113,53 @@ function VehicleDocPanel({ vehicleId, clientId }: { vehicleId: string; clientId:
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [docType, setDocType] = useState<DocumentType>("photo");
-  const [displayName, setDisplayName] = useState("");
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
+  const [galleryImages, setGalleryImages] = useState<Array<{ url: string; name: string }> | null>(null);
+  const [galleryIndex, setGalleryIndex] = useState(0);
 
-  const handleUpload = async (e: React.FormEvent) => {
+  // Load signed URLs for photos
+  useEffect(() => {
+    const loadImageUrls = async () => {
+      const photos = docs.filter((d) => d.document_type === "photo");
+      const urls: Record<string, string> = {};
+      for (const photo of photos) {
+        const url = await getSignedUrl(photo.storage_path);
+        if (url) urls[photo.id] = url;
+      }
+      setImageUrls(urls);
+    };
+    loadImageUrls();
+  }, [docs, getSignedUrl]);
+
+  const handleBulkUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    const file = fileRef.current?.files?.[0];
-    if (!file) return;
+    const files = fileRef.current?.files;
+    if (!files || files.length === 0) return;
+
     setUploadError(null);
+    setUploadProgress({ current: 0, total: files.length });
+
     try {
-      await upload.mutateAsync({
-        vehicleId,
-        clientId,
-        file,
-        documentType: docType,
-        displayName: displayName || file.name,
-      });
-      setDisplayName("");
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setUploadProgress({ current: i + 1, total: files.length });
+        
+        await upload.mutateAsync({
+          vehicleId,
+          clientId,
+          file,
+          documentType: docType,
+          displayName: file.name,
+        });
+      }
+
       if (fileRef.current) fileRef.current.value = "";
+      setUploadProgress(null);
     } catch (err: unknown) {
       setUploadError(err instanceof Error ? err.message : "Upload failed.");
+      setUploadProgress(null);
     }
   };
 
@@ -140,87 +168,192 @@ function VehicleDocPanel({ vehicleId, clientId }: { vehicleId: string; clientId:
     if (url) window.open(url, "_blank");
   };
 
+  const openGallery = async (photoDoc: typeof docs[0]) => {
+    const photos = docs.filter((d) => d.document_type === "photo");
+    const urls = await Promise.all(
+      photos.map(async (p) => {
+        const url = imageUrls[p.id] || (await getSignedUrl(p.storage_path));
+        return { url: url || "", name: p.display_name };
+      })
+    );
+    const index = photos.findIndex((p) => p.id === photoDoc.id);
+    setGalleryImages(urls);
+    setGalleryIndex(index);
+  };
+
+  const photos = docs.filter((d) => d.document_type === "photo");
+  const otherDocs = docs.filter((d) => d.document_type !== "photo");
+
   return (
     <div className="border border-border/40 bg-card/20 p-4 mt-3">
       {/* Upload form */}
-      <form onSubmit={handleUpload} className="flex flex-wrap items-end gap-3 mb-4">
-        <div>
-          <label className="block text-xs text-muted-foreground mb-1">Type</label>
-          <select
-            value={docType}
-            onChange={(e) => setDocType(e.target.value as DocumentType)}
-            className="bg-background/60 border border-border/60 text-foreground px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/60"
+      <form onSubmit={handleBulkUpload} className="mb-4">
+        <div className="flex flex-wrap items-end gap-3 mb-2">
+          <div>
+            <label className="block text-xs font-semibold text-foreground mb-1">Type</label>
+            <select
+              value={docType}
+              onChange={(e) => setDocType(e.target.value as DocumentType)}
+              className="bg-background/60 border border-border/60 text-foreground px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/60 rounded"
+            >
+              {DOC_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t.replace("_", " ")}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
+              {docType === "photo" ? "Select Photos (multiple)" : "Select File"}
+            </label>
+            <input
+              ref={fileRef}
+              type="file"
+              multiple={docType === "photo"}
+              accept={docType === "photo" ? "image/*" : undefined}
+              required
+              className="w-full text-xs text-muted-foreground file:mr-2 file:py-1.5 file:px-3 file:rounded file:border file:border-border/60 file:bg-card file:text-foreground file:text-xs file:font-medium hover:file:bg-muted/50 file:transition-colors"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={upload.isPending || uploadProgress !== null}
+            className="flex items-center gap-1.5 bg-primary hover:bg-primary/90 text-white px-4 py-2 text-xs font-semibold rounded transition-all disabled:opacity-50 shadow-sm"
           >
-            {DOC_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t.replace("_", " ")}
-              </option>
-            ))}
-          </select>
+            <Upload className="h-3.5 w-3.5" />
+            {uploadProgress
+              ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...`
+              : "Upload"}
+          </button>
         </div>
-        <div>
-          <label className="block text-xs text-muted-foreground mb-1">Display name</label>
-          <input
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Leave blank to use filename"
-            className="bg-background/60 border border-border/60 text-foreground px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary/60 w-52"
-          />
-        </div>
-        <div>
-          <label className="block text-xs text-muted-foreground mb-1">File</label>
-          <input
-            ref={fileRef}
-            type="file"
-            required
-            className="text-xs text-muted-foreground file:mr-2 file:py-1 file:px-3 file:border file:border-border/60 file:bg-card/60 file:text-foreground file:text-xs"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={upload.isPending}
-          className="flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary px-3 py-1.5 text-xs font-medium transition-all disabled:opacity-50"
-        >
-          <Upload className="h-3.5 w-3.5" />
-          {upload.isPending ? "Uploading…" : "Upload"}
-        </button>
+
+        {uploadProgress && (
+          <div className="mt-2">
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary transition-all duration-300"
+                style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Uploading {uploadProgress.current} of {uploadProgress.total} files...
+            </p>
+          </div>
+        )}
       </form>
+
       {uploadError && (
-        <p className="text-xs text-destructive mb-3">{uploadError}</p>
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-3">
+          <p className="text-xs text-red-500 font-medium">{uploadError}</p>
+        </div>
       )}
 
-      {docs.length === 0 ? (
-        <p className="text-xs text-muted-foreground">No documents yet.</p>
-      ) : (
-        <div className="space-y-1.5">
-          {docs.map((d) => (
-            <div key={d.id} className="flex items-center gap-3 text-xs py-1.5 border-b border-border/20 last:border-0">
-              <span className="text-muted-foreground capitalize w-20 flex-shrink-0">
-                {d.document_type.replace("_", " ")}
-              </span>
-              <span className="flex-1 text-foreground truncate">{d.display_name}</span>
-              <span className="text-muted-foreground hidden sm:block">
-                {format(new Date(d.created_at), "d MMM yyyy")}
-              </span>
-              <button
-                onClick={() => handleOpen(d.storage_path)}
-                className="text-primary hover:text-primary/80 transition-colors flex-shrink-0"
-                title="Open"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={() =>
-                  deleteMut.mutate({ id: d.id, vehicleId, storagePath: d.storage_path })
-                }
-                className="text-muted-foreground hover:text-destructive transition-colors flex-shrink-0"
-                title="Delete"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
+      {/* Photos Grid */}
+      {photos.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-xs font-bold text-foreground uppercase tracking-wider mb-3">
+            Photos ({photos.length})
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {photos.map((photo) => (
+              <div key={photo.id} className="group relative aspect-square rounded-lg overflow-hidden bg-muted border border-border/50">
+                {imageUrls[photo.id] ? (
+                  <img
+                    src={imageUrls[photo.id]}
+                    alt={photo.display_name}
+                    className="w-full h-full object-cover cursor-pointer transition-transform group-hover:scale-105"
+                    onClick={() => openGallery(photo)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  </div>
+                )}
+                
+                {/* Overlay on hover */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                  <button
+                    onClick={() => openGallery(photo)}
+                    className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
+                    title="View fullscreen"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteMut.mutate({ id: photo.id, vehicleId, storagePath: photo.storage_path });
+                    }}
+                    className="p-2 rounded-full bg-red-500/80 hover:bg-red-500 text-white transition-colors"
+                    title="Delete photo"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* File name tooltip */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-xs text-white truncate">{photo.display_name}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+      )}
+
+      {/* Other Documents List */}
+      {otherDocs.length > 0 && (
+        <div>
+          <h4 className="text-xs font-bold text-foreground uppercase tracking-wider mb-3">
+            Documents ({otherDocs.length})
+          </h4>
+          <div className="space-y-1.5">
+            {otherDocs.map((d) => (
+              <div
+                key={d.id}
+                className="flex items-center gap-3 text-xs py-2 px-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+              >
+                <span className="text-muted-foreground capitalize w-24 flex-shrink-0 font-medium">
+                  {d.document_type.replace("_", " ")}
+                </span>
+                <span className="flex-1 text-foreground truncate font-medium">{d.display_name}</span>
+                <span className="text-muted-foreground hidden sm:block text-xs">
+                  {format(new Date(d.created_at), "d MMM yyyy")}
+                </span>
+                <button
+                  onClick={() => handleOpen(d.storage_path)}
+                  className="text-primary hover:text-primary/80 transition-colors flex-shrink-0 p-1"
+                  title="Open"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() =>
+                    deleteMut.mutate({ id: d.id, vehicleId, storagePath: d.storage_path })
+                  }
+                  className="text-muted-foreground hover:text-destructive transition-colors flex-shrink-0 p-1"
+                  title="Delete"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {docs.length === 0 && (
+        <p className="text-xs text-muted-foreground text-center py-8">No documents yet.</p>
+      )}
+
+      {/* Image Gallery Modal */}
+      {galleryImages && (
+        <ImageGallery
+          images={galleryImages}
+          initialIndex={galleryIndex}
+          onClose={() => setGalleryImages(null)}
+        />
       )}
     </div>
   );
