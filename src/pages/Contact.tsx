@@ -1,37 +1,18 @@
 /**
  * Contact Page
  * 
- * Contact form and business information with Japanese-styled design.
- * Includes contact form, business details, and location information.
+ * Contact information with WhatsApp integration.
+ * Includes business details and direct messaging option.
  */
 
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
-import { useState } from "react";
+import { Mail, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: "",
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const whatsappNumber = "+81705552370"; // Format for WhatsApp link (no spaces or hyphens)
+  const displayNumber = "+81 70-5555-2370"; // Format for display
+  const whatsappMessage = encodeURIComponent("Hello, I'm interested in importing a vehicle from Japan. Can you help me?");
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
   return (
     <PageLayout>
@@ -66,97 +47,43 @@ const Contact = () => {
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Contact Form */}
-            <div className="border-shoji p-6 sm:p-8 bg-card/40 backdrop-blur-sm relative">
-              <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-primary/60" />
-              <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-primary/60" />
+            {/* WhatsApp Contact Card */}
+            <div className="border-shoji p-8 sm:p-10 bg-card/40 backdrop-blur-sm relative group hover:bg-card/60 transition-all duration-300">
+              <div className="absolute -top-3 -left-3 w-6 h-6 border-l-2 border-t-2 border-primary/60" />
+              <div className="absolute -top-3 -right-3 w-6 h-6 border-r-2 border-t-2 border-primary/60" />
+              <div className="absolute -bottom-3 -left-3 w-6 h-6 border-l-2 border-b-2 border-primary/60" />
+              <div className="absolute -bottom-3 -right-3 w-6 h-6 border-r-2 border-b-2 border-primary/60" />
               
-              <h2 className="font-display text-2xl sm:text-3xl text-foreground mb-6">
-                Send Us a Message
-              </h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm text-muted-foreground mb-2">Name *</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 bg-background/50 border border-border rounded-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                  />
+              <div className="text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="w-20 h-20 rounded-full bg-[#25D366]/10 border-2 border-[#25D366]/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <MessageCircle className="w-10 h-10 text-[#25D366]" />
+                  </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm text-muted-foreground mb-2">Email *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 bg-background/50 border border-border rounded-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                  />
-                </div>
+                <h2 className="font-display text-3xl sm:text-4xl text-foreground mb-4">
+                  Message Us on WhatsApp
+                </h2>
                 
-                <div>
-                  <label className="block text-sm text-muted-foreground mb-2">Phone</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-background/50 border border-border rounded-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm text-muted-foreground mb-2">Subject *</label>
-                  <select
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 bg-background/50 border border-border rounded-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                  >
-                    <option value="">Select a subject</option>
-                    <option value="general">General Inquiry</option>
-                    <option value="import">Import Question</option>
-                    <option value="quote">Request Quote</option>
-                    <option value="existing">Existing Order</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm text-muted-foreground mb-2">Message *</label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-3 bg-background/50 border border-border rounded-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
-                  />
-                </div>
-                
-                <button
-                  type="submit"
-                  className="
-                    w-full py-4 px-8
-                    bg-primary/20 hover:bg-primary/30
-                    border border-primary/50 hover:border-primary
-                    text-primary font-medium
-                    transition-all duration-200
-                    uppercase tracking-[0.2em] text-sm
-                    flex items-center justify-center gap-3
-                    group
-                  "
+                <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+                  Get instant responses to your questions. Chat with our team directly on WhatsApp 
+                  for quick, convenient communication about your vehicle import needs.
+                </p>
+
+                <a
+                  href={whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-8 py-5 bg-[#25D366]/20 hover:bg-[#25D366]/30 border-2 border-[#25D366]/50 hover:border-[#25D366] text-[#25D366] font-medium transition-all duration-200 uppercase tracking-[0.2em] text-sm group cursor-pointer"
                 >
-                  <span>Send Message</span>
-                  <Send className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-                </button>
-              </form>
+                  <MessageCircle className="w-6 h-6" />
+                  <span>Start WhatsApp Chat</span>
+                </a>
+
+                <p className="text-muted-foreground/60 text-sm mt-6">
+                  Available for quick inquiries and immediate assistance
+                </p>
+              </div>
             </div>
 
             {/* Contact Information */}
@@ -166,7 +93,7 @@ const Contact = () => {
                 <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-primary/60" />
                 
                 <h2 className="font-display text-2xl sm:text-3xl text-foreground mb-6">
-                  Get In Touch
+                  Contact Details
                 </h2>
                 
                 <div className="space-y-6">
@@ -188,8 +115,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-display text-lg text-foreground mb-1">Phone</h3>
-                      <a href="tel:+1234567890" className="text-muted-foreground hover:text-primary transition-colors">
-                        +1 (234) 567-8900
+                      <a href={`tel:${whatsappNumber}`} className="text-muted-foreground hover:text-primary transition-colors">
+                        {displayNumber}
                       </a>
                     </div>
                   </div>

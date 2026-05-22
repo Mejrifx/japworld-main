@@ -14,7 +14,6 @@ import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Services from "./pages/Services";
 import Auctions from "./pages/Auctions";
-import Calculator from "./pages/Calculator";
 import FAQ from "./pages/FAQ";
 import Testimonials from "./pages/Testimonials";
 import Contact from "./pages/Contact";
@@ -65,7 +64,6 @@ const App = () => (
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/services" element={<Services />} />
             <Route path="/auctions" element={<Auctions />} />
-            <Route path="/calculator" element={<Calculator />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/testimonials" element={<Testimonials />} />
             <Route path="/contact" element={<Contact />} />

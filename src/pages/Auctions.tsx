@@ -1,12 +1,11 @@
 /**
  * Auctions Page
  * 
- * Auction search and listing page with search functionality
- * and auction information.
+ * Auction information page showcasing major Japanese auction houses
+ * and their features.
  */
 
-import { Search, Filter, Calendar, MapPin, TrendingUp, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { Filter, Calendar, MapPin, TrendingUp, AlertCircle } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
 const auctionHouses = [
@@ -31,8 +30,6 @@ const auctionHouses = [
 ];
 
 const Auctions = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-
   return (
     <PageLayout>
       {/* Hero Section */}
@@ -40,7 +37,7 @@ const Auctions = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-background via-card/20 to-background" />
         
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-          <div className="text-center mb-12 animate-fade-in">
+          <div className="text-center mb-16 sm:mb-20 animate-fade-in">
             <span className="block text-primary/40 text-3xl mb-6 font-display">競売検索</span>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-6">
               Japanese Auctions
@@ -51,33 +48,9 @@ const Auctions = () => {
               <span className="h-px w-20 sm:w-32 bg-gradient-to-l from-transparent to-primary/50" />
             </div>
             <p className="text-muted-foreground text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
-              Access Japan's premier auction houses. Search thousands of vehicles, set alerts, 
-              and find your perfect car.
+              We provide access to Japan's premier auction houses with over 60,000 vehicles weekly. 
+              Our experienced team physically attends auctions and inspects vehicles on your behalf.
             </p>
-          </div>
-
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-16">
-            <div className="border-shoji p-6 bg-card/40 backdrop-blur-sm relative">
-              <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-primary/60" />
-              <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-primary/60" />
-              
-              <div className="flex gap-3">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by make, model, year..."
-                    className="w-full pl-12 pr-4 py-3 bg-background/50 border border-border rounded-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                  />
-                </div>
-                <button className="px-6 py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 hover:border-primary text-primary font-medium transition-all duration-200 uppercase tracking-[0.15em] text-sm">
-                  Search
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -142,12 +115,12 @@ const Auctions = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center flex-shrink-0">
-                  <Search className="w-6 h-6 text-primary" />
+                  <MapPin className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-display text-xl text-foreground mb-2">Advanced Search</h3>
+                  <h3 className="font-display text-xl text-foreground mb-2">Physical Presence</h3>
                   <p className="text-muted-foreground text-sm">
-                    Filter by make, model, year, mileage, grade, and price range. Find exactly what you're looking for.
+                    Our team physically attends major Japanese auctions and personally inspects vehicles before bidding.
                   </p>
                 </div>
               </div>

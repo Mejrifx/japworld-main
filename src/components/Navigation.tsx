@@ -20,7 +20,6 @@ const navLinks = [
   { label: "How It Works", path: "/how-it-works" },
   { label: "Services", path: "/services" },
   { label: "Auctions", path: "/auctions" },
-  { label: "Cost Calculator", path: "/calculator" },
   { label: "FAQ", path: "/faq" },
   { label: "Testimonials", path: "/testimonials" },
   { label: "Contact", path: "/contact" },

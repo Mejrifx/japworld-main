@@ -129,9 +129,9 @@ const HowItWorks = () => {
                   style={{ animationDelay: `${index * 150}ms` }}
                 >
                   {/* Desktop Layout */}
-                  <div className="hidden lg:flex items-start gap-8">
-                    {/* Left Content */}
-                    <div className={`flex-1 ${isEven ? 'order-1' : 'order-3'}`}>
+                  <div className="hidden lg:grid grid-cols-2 gap-8">
+                    {/* Content - alternates between left and right */}
+                    <div className={isEven ? 'col-start-1' : 'col-start-2'}>
                       <div className="border-shoji p-8 bg-card/40 backdrop-blur-sm relative group hover:bg-card/60 transition-all duration-300">
                         <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-primary/60" />
                         <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-primary/60" />
@@ -167,21 +167,13 @@ const HowItWorks = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* Center Icon */}
-                    <div className="order-2 relative z-10">
-                      <div className="w-20 h-20 rounded-full bg-background border-2 border-primary/40 flex items-center justify-center shadow-lg">
-                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon className="w-8 h-8 text-primary" />
-                        </div>
+                    
+                    {/* Center connector line - positioned between columns */}
+                    {index < steps.length - 1 && (
+                      <div className="col-span-2 flex justify-center">
+                        <div className="w-px h-12 bg-gradient-to-b from-primary/40 to-transparent" />
                       </div>
-                      {index < steps.length - 1 && (
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-primary/40 to-transparent" />
-                      )}
-                    </div>
-
-                    {/* Right Spacer */}
-                    <div className="flex-1 order-3" />
+                    )}
                   </div>
 
                   {/* Mobile Layout */}
