@@ -1,17 +1,12 @@
 /**
  * Index Page - JapWorld Homepage
- * 
- * Homepage with hero section and navigation to other pages.
- * 
- * PASSWORD:
- * - Current password: "japanimport"
- * - To change: Edit SITE_PASSWORD in src/components/PasswordGate.tsx
+ *
+ * Public marketing homepage. Client/admin portals use Supabase auth separately.
  */
 
 import { Link } from "react-router-dom";
 import japworldBg from "@/assets/japworld-bg.png";
 import japworldLogo from "@/assets/japworld-logo.png";
-import PasswordGate from "@/components/PasswordGate";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { 
@@ -114,7 +109,7 @@ const Index = () => {
   ];
 
   return (
-    <PasswordGate>
+    <>
       <Navigation />
 
       <main className="relative w-full">
@@ -586,7 +581,7 @@ const Index = () => {
       </main>
 
       <Footer />
-    </PasswordGate>
+    </>
   );
 };
 
