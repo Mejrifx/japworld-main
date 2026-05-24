@@ -5,7 +5,7 @@
  * Includes business details and direct messaging option.
  */
 
-import { Mail, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
 const Contact = () => {
@@ -103,8 +103,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-display text-lg text-foreground mb-1">Email</h3>
-                      <a href="mailto:info@japworld.com" className="text-muted-foreground hover:text-primary transition-colors">
-                        info@japworld.com
+                      <a href="mailto:Japworldofficial@gmail.com" className="text-muted-foreground hover:text-primary transition-colors">
+                        Japworldofficial@gmail.com
                       </a>
                     </div>
                   </div>
@@ -128,23 +128,8 @@ const Contact = () => {
                     <div>
                       <h3 className="font-display text-lg text-foreground mb-1">Office</h3>
                       <p className="text-muted-foreground">
-                        Tokyo, Japan<br />
-                        London, UK<br />
-                        Los Angeles, USA
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-display text-lg text-foreground mb-1">Business Hours</h3>
-                      <p className="text-muted-foreground">
-                        Monday - Friday: 9:00 AM - 6:00 PM<br />
-                        Saturday: 10:00 AM - 4:00 PM<br />
-                        Sunday: Closed
+                        Chiba-ken, Narita-shi<br />
+                        Taka 478-1, Japan
                       </p>
                     </div>
                   </div>

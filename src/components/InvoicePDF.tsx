@@ -222,12 +222,11 @@ export const InvoicePDF = ({
             </Text>
           </View>
           <View style={styles.companyInfo}>
-            <Text>JapWorld Limited</Text>
-            <Text>Unit 5, Industrial Estate</Text>
-            <Text>Birmingham, B10 0HF</Text>
-            <Text>United Kingdom</Text>
-            <Text style={{ marginTop: 5 }}>Email: info@japworld.co.uk</Text>
-            <Text>Tel: +44 (0) 121 XXX XXXX</Text>
+            <Text>JapWorld</Text>
+            <Text>Chiba-ken, Narita-shi</Text>
+            <Text>Taka 478-1, Japan</Text>
+            <Text style={{ marginTop: 5 }}>Email: Japworldofficial@gmail.com</Text>
+            <Text>Tel: +81 70-5555-2370</Text>
             <Text>Web: www.japworld.co.uk</Text>
           </View>
         </View>

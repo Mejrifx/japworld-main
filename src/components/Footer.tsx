@@ -100,13 +100,13 @@ const Footer = () => {
             <ul className="space-y-4">
               <li>
                 <a 
-                  href="mailto:info@japworld.com" 
+                  href="mailto:Japworldofficial@gmail.com" 
                   className="flex items-start gap-3 text-muted-foreground hover:text-primary transition-colors group"
                 >
                   <Mail className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="text-sm font-medium text-foreground group-hover:text-primary">Email</div>
-                    <div className="text-sm">info@japworld.com</div>
+                    <div className="text-sm">Japworldofficial@gmail.com</div>
                   </div>
                 </a>
               </li>
@@ -128,8 +128,8 @@ const Footer = () => {
                   <div>
                     <div className="text-sm font-medium text-foreground">Address</div>
                     <div className="text-sm">
-                      1-2-3 Minato-ku<br />
-                      Tokyo, Japan 105-0001
+                      Chiba-ken, Narita-shi<br />
+                      Taka 478-1, Japan
                     </div>
                   </div>
                 </div>
@@ -137,21 +137,18 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Business Hours & Newsletter */}
+          {/* Newsletter */}
           <div>
             <h3 className="font-display text-lg text-foreground mb-6 flex items-center gap-2">
-              <span className="text-primary/40 text-sm">営業時間</span>
-              Business Hours
+              <span className="text-primary/40 text-sm">更新</span>
+              Stay Updated
             </h3>
-            <div className="text-muted-foreground text-sm space-y-2 mb-8">
-              <p><span className="text-foreground">Monday - Friday:</span> 9:00 - 18:00 JST</p>
-              <p><span className="text-foreground">Saturday:</span> 10:00 - 15:00 JST</p>
-              <p><span className="text-foreground">Sunday:</span> Closed</p>
-            </div>
+            <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+              Get import tips, auction updates, and news from JapWorld.
+            </p>
             
             {/* Newsletter Signup */}
             <div>
-              <h4 className="font-display text-sm text-foreground mb-3">Stay Updated</h4>
               <div className="flex gap-2">
                 <input
                   type="email"
