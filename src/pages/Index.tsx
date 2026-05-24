@@ -130,20 +130,35 @@ const Index = () => {
               />
             </div>
             
-            <div className="animate-fade-in-delayed mt-6 sm:mt-8 md:mt-10 text-center px-2 max-w-4xl">
-              <h1 className="text-primary text-xs sm:text-sm md:text-base lg:text-lg font-medium uppercase tracking-[0.25em] sm:tracking-[0.3em] md:tracking-[0.4em] leading-relaxed mb-4">
-                Japanese Vehicle Import & Export Services
-              </h1>
-              <p className="text-foreground text-xl sm:text-2xl md:text-3xl font-display mb-6">
-                Your Trusted Japan Vehicle Import Partner
-              </p>
-              <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed mb-8">
-                We provide a reliable, transparent, and cost-effective service for importing vehicles directly from Japan.
-              </p>
-              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-3xl mx-auto">
-                As a licensed import and export agent with over 25 years of experience in the Japanese automotive industry, 
-                we work on your side from start to finish, ensuring a smooth, secure, and professional process every step of the way.
-              </p>
+            <div className="animate-fade-in mt-8 sm:mt-10 md:mt-12 w-full max-w-3xl px-4 sm:px-6">
+              <div className="rounded-2xl border border-border/50 bg-background/55 backdrop-blur-md px-6 py-8 sm:px-10 sm:py-10 text-center shadow-lg">
+                {/* Eyebrow — category label, not a headline */}
+                <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-foreground/55 mb-5">
+                  Japanese Vehicle Import &amp; Export Services
+                </p>
+
+                <div className="flex items-center justify-center gap-3 mb-6">
+                  <span className="h-px w-10 sm:w-14 bg-gradient-to-r from-transparent to-foreground/25" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" aria-hidden />
+                  <span className="h-px w-10 sm:w-14 bg-gradient-to-l from-transparent to-foreground/25" />
+                </div>
+
+                {/* Primary headline */}
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-[1.15] tracking-tight mb-6">
+                  Your Trusted Japan Vehicle Import Partner
+                </h1>
+
+                {/* Lead line — same tone family, slightly emphasized */}
+                <p className="text-base sm:text-lg text-foreground/90 font-medium leading-relaxed mb-5 max-w-2xl mx-auto">
+                  We provide a reliable, transparent, and cost-effective service for importing vehicles directly from Japan.
+                </p>
+
+                {/* Supporting copy — unified body style */}
+                <p className="text-sm sm:text-base text-foreground/70 leading-relaxed max-w-2xl mx-auto">
+                  As a licensed import and export agent with over 25 years of experience in the Japanese automotive industry,
+                  we work on your side from start to finish — ensuring a smooth, secure, and professional process every step of the way.
+                </p>
+              </div>
             </div>
           </div>
         </section>
