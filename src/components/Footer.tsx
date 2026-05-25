@@ -12,6 +12,7 @@
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Instagram, Facebook, Youtube } from "lucide-react";
 import japworldLogo from "@/assets/japworld-logo.png";
+import { WHATSAPP_DIGITS, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
 
 const quickLinks = [
   { label: "About Us", path: "/about" },
@@ -112,13 +113,13 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="tel:+81123456789" 
+                  href={`tel:+${WHATSAPP_DIGITS}`}
                   className="flex items-start gap-3 text-muted-foreground hover:text-primary transition-colors group"
                 >
                   <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="text-sm font-medium text-foreground group-hover:text-primary">Phone</div>
-                    <div className="text-sm">+81 123-456-789</div>
+                    <div className="text-sm">{WHATSAPP_DISPLAY}</div>
                   </div>
                 </a>
               </li>
