@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ClientRoute } from "@/components/ClientRoute";
 import { AdminRoute } from "@/components/AdminRoute";
+import { FloatingWhatsAppButton } from "@/components/FloatingWhatsAppButton";
 
 // Public pages
 import Index from "./pages/Index";
@@ -57,6 +58,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+          <FloatingWhatsAppButton />
           <Routes>
             {/* ── Public site ── */}
             <Route path="/" element={<Index />} />

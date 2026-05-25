@@ -5,17 +5,13 @@
  * Includes business details and direct messaging option.
  */
 
-import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
+import { WhatsAppLogo } from "@/components/WhatsAppLogo";
+import { getWhatsAppLink, WHATSAPP_DIGITS, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
 
 const Contact = () => {
-  // Japan mobile: +81 70-5555-2370 → international digits only (no +, spaces, or hyphens) for wa.me
-  const whatsappDigits = "817055552370";
-  const displayNumber = "+81 70-5555-2370";
-  const whatsappMessage = encodeURIComponent(
-    "Hello, I'm interested in importing a vehicle from Japan. Can you help me?"
-  );
-  const whatsappLink = `https://wa.me/${whatsappDigits}?text=${whatsappMessage}`;
+  const whatsappLink = getWhatsAppLink();
 
   return (
     <PageLayout>
@@ -59,8 +55,8 @@ const Contact = () => {
               
               <div className="text-center">
                 <div className="flex justify-center mb-6">
-                  <div className="w-20 h-20 rounded-full bg-[#25D366]/10 border-2 border-[#25D366]/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <MessageCircle className="w-10 h-10 text-[#25D366]" />
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#25D366]/10 border-2 border-[#25D366]/30 flex items-center justify-center p-3 group-hover:scale-110 transition-transform">
+                    <WhatsAppLogo size="xl" className="h-full w-full" />
                   </div>
                 </div>
                 
@@ -79,7 +75,7 @@ const Contact = () => {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-3 px-8 py-5 bg-[#25D366]/20 hover:bg-[#25D366]/30 border-2 border-[#25D366]/50 hover:border-[#25D366] text-[#25D366] font-medium transition-all duration-200 uppercase tracking-[0.2em] text-sm group cursor-pointer"
                 >
-                  <MessageCircle className="w-6 h-6" />
+                  <WhatsAppLogo size="sm" className="h-7 w-7" />
                   <span>Start WhatsApp Chat</span>
                 </a>
 
@@ -118,8 +114,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-display text-lg text-foreground mb-1">Phone</h3>
-                      <a href={`tel:+${whatsappDigits}`} className="text-muted-foreground hover:text-primary transition-colors">
-                        {displayNumber}
+                      <a href={`tel:+${WHATSAPP_DIGITS}`} className="text-muted-foreground hover:text-primary transition-colors">
+                        {WHATSAPP_DISPLAY}
                       </a>
                     </div>
                   </div>
