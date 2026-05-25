@@ -26,7 +26,12 @@ export function FloatingWhatsAppButton() {
         "
       >
         <span
-          className="pointer-events-none absolute inset-0 -m-2 rounded-full bg-[#25D366]/15 blur-xl animate-whatsapp-glow"
+          className="pointer-events-none absolute inset-0 -m-3 rounded-full bg-[#25D366]/28 blur-2xl animate-whatsapp-glow"
+          aria-hidden
+        />
+        <span
+          className="pointer-events-none absolute inset-0 -m-1.5 rounded-full bg-[#25D366]/18 blur-lg animate-whatsapp-glow"
+          style={{ animationDelay: "0.5s" }}
           aria-hidden
         />
         <WhatsAppLogo

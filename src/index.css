@@ -312,21 +312,22 @@
 
   @keyframes whatsapp-glow {
     0%, 100% {
-      opacity: 0.2;
-      transform: scale(1);
+      opacity: 0.32;
+      transform: scale(0.98);
     }
     50% {
-      opacity: 0.42;
-      transform: scale(1.05);
+      opacity: 0.68;
+      transform: scale(1.08);
     }
   }
 
   @keyframes whatsapp-glow-shadow {
     0%, 100% {
-      filter: drop-shadow(0 0 4px rgba(37, 211, 102, 0.2));
+      filter: drop-shadow(0 0 6px rgba(37, 211, 102, 0.32));
     }
     50% {
-      filter: drop-shadow(0 0 10px rgba(37, 211, 102, 0.38));
+      filter: drop-shadow(0 0 14px rgba(37, 211, 102, 0.58))
+        drop-shadow(0 0 22px rgba(37, 211, 102, 0.28));
     }
   }
 
@@ -358,11 +359,11 @@
   }
 
   .animate-whatsapp-glow {
-    animation: whatsapp-glow 3.5s ease-in-out infinite;
+    animation: whatsapp-glow 2.8s ease-in-out infinite;
   }
 
   .animate-whatsapp-glow-shadow {
-    animation: whatsapp-glow-shadow 3.5s ease-in-out infinite;
+    animation: whatsapp-glow-shadow 2.8s ease-in-out infinite;
   }
   
   /* Respect user's motion preferences (WCAG AAA) */
