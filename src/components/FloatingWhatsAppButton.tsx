@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { getWhatsAppLink } from "@/lib/whatsapp";
 import { WhatsAppLogo } from "@/components/WhatsAppLogo";
 
-/** Fixed bottom-left WhatsApp chat entry — hidden on admin routes */
+/** Fixed bottom-right WhatsApp chat entry — hidden on admin routes */
 export function FloatingWhatsAppButton() {
   const { pathname } = useLocation();
 
@@ -11,7 +11,7 @@ export function FloatingWhatsAppButton() {
   }
 
   return (
-    <div className="fixed bottom-5 left-5 z-[60]">
+    <div className="fixed bottom-5 right-5 z-[60]">
       <a
         href={getWhatsAppLink()}
         target="_blank"
@@ -35,6 +35,7 @@ export function FloatingWhatsAppButton() {
           aria-hidden
         />
         <WhatsAppLogo
+          variant="2d"
           size="lg"
           className="relative z-10 h-16 w-16 sm:h-20 sm:w-20 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)] animate-whatsapp-glow-shadow"
         />
