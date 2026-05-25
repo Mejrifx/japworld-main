@@ -9,10 +9,13 @@ import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
 const Contact = () => {
-  const whatsappNumber = "+81705552370"; // Format for WhatsApp link (no spaces or hyphens)
-  const displayNumber = "+81 70-5555-2370"; // Format for display
-  const whatsappMessage = encodeURIComponent("Hello, I'm interested in importing a vehicle from Japan. Can you help me?");
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+  // Japan mobile: +81 70-5555-2370 → international digits only (no +, spaces, or hyphens) for wa.me
+  const whatsappDigits = "817055552370";
+  const displayNumber = "+81 70-5555-2370";
+  const whatsappMessage = encodeURIComponent(
+    "Hello, I'm interested in importing a vehicle from Japan. Can you help me?"
+  );
+  const whatsappLink = `https://wa.me/${whatsappDigits}?text=${whatsappMessage}`;
 
   return (
     <PageLayout>
@@ -115,7 +118,7 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-display text-lg text-foreground mb-1">Phone</h3>
-                      <a href={`tel:${whatsappNumber}`} className="text-muted-foreground hover:text-primary transition-colors">
+                      <a href={`tel:+${whatsappDigits}`} className="text-muted-foreground hover:text-primary transition-colors">
                         {displayNumber}
                       </a>
                     </div>
