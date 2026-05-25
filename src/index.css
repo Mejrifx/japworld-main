@@ -365,6 +365,77 @@
   .animate-whatsapp-glow-shadow {
     animation: whatsapp-glow-shadow 2.8s ease-in-out infinite;
   }
+
+  /* Hero cherry-blossom petal fall (hero section only) */
+  @keyframes petal-fall-a {
+    0% {
+      transform: translate3d(0, -15vh, 0) rotate(0deg) rotateY(0deg);
+      opacity: 0;
+    }
+    6% {
+      opacity: var(--petal-opacity, 0.85);
+    }
+    20% {
+      transform: translate3d(calc(var(--petal-sway) * 0.35), 22vh, 0)
+        rotate(calc(var(--petal-spin) * 0.2)) rotateY(25deg);
+    }
+    45% {
+      transform: translate3d(calc(var(--petal-sway) * -0.55), 48vh, 0)
+        rotate(calc(var(--petal-spin) * 0.45)) rotateY(-18deg);
+    }
+    70% {
+      transform: translate3d(calc(var(--petal-sway) * 0.75), 74vh, 0)
+        rotate(calc(var(--petal-spin) * 0.72)) rotateY(12deg);
+    }
+    88% {
+      opacity: var(--petal-opacity, 0.85);
+    }
+    100% {
+      transform: translate3d(var(--petal-sway), 115vh, 0) rotate(var(--petal-spin))
+        rotateY(0deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes petal-fall-b {
+    0% {
+      transform: translate3d(0, -18vh, 0) rotate(45deg) rotateY(15deg);
+      opacity: 0;
+    }
+    8% {
+      opacity: var(--petal-opacity, 0.85);
+    }
+    30% {
+      transform: translate3d(calc(var(--petal-sway) * -0.4), 32vh, 0)
+        rotate(calc(var(--petal-spin) * 0.28)) rotateY(-22deg);
+    }
+    55% {
+      transform: translate3d(calc(var(--petal-sway) * 0.65), 58vh, 0)
+        rotate(calc(var(--petal-spin) * 0.58)) rotateY(20deg);
+    }
+    80% {
+      transform: translate3d(calc(var(--petal-sway) * -0.25), 88vh, 0)
+        rotate(calc(var(--petal-spin) * 0.88)) rotateY(-8deg);
+    }
+    92% {
+      opacity: var(--petal-opacity, 0.85);
+    }
+    100% {
+      transform: translate3d(calc(var(--petal-sway) * 0.6), 118vh, 0)
+        rotate(calc(var(--petal-spin) + 90deg)) rotateY(0deg);
+      opacity: 0;
+    }
+  }
+
+  .animate-petal-fall-a {
+    animation: petal-fall-a var(--petal-duration, 12s) linear infinite;
+    animation-delay: var(--petal-delay, 0s);
+  }
+
+  .animate-petal-fall-b {
+    animation: petal-fall-b var(--petal-duration, 14s) linear infinite;
+    animation-delay: var(--petal-delay, 0s);
+  }
   
   /* Respect user's motion preferences (WCAG AAA) */
   @media (prefers-reduced-motion: reduce) {
@@ -374,6 +445,8 @@
     .animate-metric-pulse,
     .animate-whatsapp-glow,
     .animate-whatsapp-glow-shadow,
+    .animate-petal-fall-a,
+    .animate-petal-fall-b,
     .animate-pulse-subtle,
     .animate-shimmer {
       animation: none;

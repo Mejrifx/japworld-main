@@ -9,6 +9,7 @@ import japworldBg from "@/assets/japworld-bg.png";
 import japworldLogo from "@/assets/japworld-logo.png";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { HeroFallingPetals } from "@/components/HeroFallingPetals";
 import { 
   ArrowRight, 
   ShoppingCart, 
@@ -120,7 +121,8 @@ const Index = () => {
             style={{ backgroundImage: `url(${japworldBg})` }}
           />
           <div className="absolute inset-0 bg-overlay" />
-          
+          <HeroFallingPetals />
+
           <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-8 sm:px-6 md:px-8">
             <div className="animate-slide-up-fade w-full max-w-[280px] sm:max-w-[320px] md:max-w-md lg:max-w-lg xl:max-w-xl">
               <img
