@@ -19,16 +19,25 @@ export function FloatingWhatsAppButton() {
       title="Message us on WhatsApp"
       className="
         fixed bottom-5 left-5 z-40
-        flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center
-        rounded-full bg-[#25D366]/15 border-2 border-[#25D366]/40
-        shadow-lg shadow-black/20
-        transition-all duration-300
-        hover:scale-110 hover:border-[#25D366] hover:bg-[#25D366]/25 hover:shadow-xl
-        active:scale-95
+        group relative flex items-center justify-center
+        transition-transform duration-300
+        hover:scale-110 active:scale-95
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-background
       "
     >
-      <WhatsAppLogo size="md" className="h-9 w-9 sm:h-11 sm:w-11" />
+      <span
+        className="pointer-events-none absolute inset-0 -m-3 rounded-full bg-[#25D366]/40 blur-2xl animate-whatsapp-glow"
+        aria-hidden
+      />
+      <span
+        className="pointer-events-none absolute inset-0 -m-1 rounded-full bg-[#25D366]/30 blur-lg animate-whatsapp-glow"
+        style={{ animationDelay: "0.6s" }}
+        aria-hidden
+      />
+      <WhatsAppLogo
+        size="lg"
+        className="relative z-10 h-16 w-16 sm:h-20 sm:w-20 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)] animate-whatsapp-glow-shadow"
+      />
     </a>
   );
 }
