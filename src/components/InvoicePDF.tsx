@@ -198,16 +198,24 @@ export const InvoicePDF = ({
   clientAddress,
   description,
   amount,
-  currency = "GBP",
+  currency = "JPY",
   vatRate,
   notes,
 }: InvoiceData) => {
   const subtotal = vatRate ? amount / (1 + vatRate / 100) : amount;
   const vatAmount = vatRate ? amount - subtotal : 0;
-  const currencySymbol = currency === "GBP" ? "£" : "$";
 
+  // Format JPY with GBP conversion
   const formatCurrency = (value: number) => {
-    return `${currencySymbol}${value.toFixed(2)}`;
+    if (currency === "JPY") {
+      const jpyFormatted = `¥${Math.round(value).toLocaleString("ja-JP")}`;
+      // Convert to GBP (using rate: £1 = ¥195)
+      const gbpValue = value / 195;
+      const gbpFormatted = `£${gbpValue.toFixed(2)}`;
+      return `${jpyFormatted} (${gbpFormatted})`;
+    }
+    // Fallback for GBP only (legacy support)
+    return `£${value.toFixed(2)}`;
   };
 
   return (
@@ -311,6 +319,11 @@ export const InvoicePDF = ({
           <Text style={{ marginTop: 8, fontSize: 9, color: "#666" }}>
             Please include invoice number {invoiceNumber} as payment reference
           </Text>
+          {currency === "JPY" && (
+            <Text style={{ marginTop: 8, fontSize: 8, color: "#999", fontStyle: "italic" }}>
+              * GBP amounts shown for reference only (Exchange rate: £1 = ¥195). Invoiced amount is in JPY.
+            </Text>
+          )}
         </View>
 
         {/* Notes */}

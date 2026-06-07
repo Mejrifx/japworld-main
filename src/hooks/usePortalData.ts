@@ -356,8 +356,8 @@ export function useCreateInvoice() {
             clientCompany: clientData.company_name,
             clientEmail: clientData.email,
             description: data.description,
-            amount: data.amount_cents / 100, // Convert cents to pounds
-            currency: "GBP",
+            amount: data.amount_cents, // Amount in JPY
+            currency: "JPY",
           };
 
           const pdfResult = await generateAndUploadInvoicePDF(
@@ -791,12 +791,15 @@ export function computeOutstanding(invoices: Invoice[]): number {
     .reduce((acc, i) => acc + i.amount_cents, 0);
 }
 
-export function formatCurrency(cents: number, currency = "GBP"): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-  }).format(cents / 100);
+/**
+ * Format currency as JPY with GBP conversion
+ * Note: Database amounts are now stored as JPY (not cents/pence)
+ * @param yen - Amount in Japanese Yen
+ * @param showGBP - Whether to show GBP conversion (default: true)
+ */
+export function formatCurrency(yen: number, showGBP: boolean = true): string {
+  const { formatDualCurrency } = require("@/lib/currency");
+  return formatDualCurrency(yen, { showGBP });
 }
 
 export const VEHICLE_STATUS_LABELS: Record<VehicleStatus, string> = {

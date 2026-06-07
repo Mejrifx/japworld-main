@@ -10,6 +10,7 @@ import {
   formatCurrency,
 } from "@/hooks/usePortalData";
 import { format } from "date-fns";
+import { ExchangeRateInfo } from "@/components/ExchangeRateInfo";
 
 const PortalAccount = () => {
   const { clientId } = useAuth();
@@ -168,6 +169,8 @@ const PortalAccount = () => {
               </div>
             </div>
           </div>
+
+          <ExchangeRateInfo />
 
           <div className="border-shoji bg-card/40 p-4">
             <p className="text-xs text-muted-foreground mb-2">

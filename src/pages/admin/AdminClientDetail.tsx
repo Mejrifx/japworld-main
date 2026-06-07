@@ -20,6 +20,7 @@ import {
 import AdminLayout from "@/components/admin/AdminLayout";
 import { ImageGallery } from "@/components/ImageGallery";
 import { PDFViewer } from "@/components/PDFViewer";
+import { ExchangeRateInfo } from "@/components/ExchangeRateInfo";
 import {
   useClientById,
   useClientTransactions,
@@ -475,12 +476,12 @@ const AdminClientDetail = () => {
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setPaymentError(null);
-    const cents = Math.round(parseFloat(paymentForm.amount) * 100);
-    if (!cents || isNaN(cents)) { setPaymentError("Enter a valid amount."); return; }
+    const yen = Math.round(parseFloat(paymentForm.amount));
+    if (!yen || isNaN(yen)) { setPaymentError("Enter a valid amount."); return; }
     try {
       await recordPayment.mutateAsync({
         client_id: id!,
-        amount_cents: cents,
+        amount_cents: yen, // Now storing JPY (amount_cents column now stores JPY, not cents)
         description: paymentForm.description || "Payment received",
         reference: paymentForm.reference || undefined,
         invoice_id: paymentForm.invoice_id || undefined,
@@ -494,12 +495,12 @@ const AdminClientDetail = () => {
   const handleInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
     setInvoiceError(null);
-    const cents = Math.round(parseFloat(invoiceForm.amount) * 100);
-    if (!cents || isNaN(cents)) { setInvoiceError("Enter a valid amount."); return; }
+    const yen = Math.round(parseFloat(invoiceForm.amount));
+    if (!yen || isNaN(yen)) { setInvoiceError("Enter a valid amount."); return; }
     try {
       const invoice = await createInvoice.mutateAsync({
         client_id: id!,
-        amount_cents: cents,
+        amount_cents: yen, // Now storing JPY (amount_cents column now stores JPY, not cents)
         description: invoiceForm.description,
         due_date: invoiceForm.due_date || undefined,
         invoice_number: invoiceForm.invoice_number || undefined,
@@ -881,16 +882,16 @@ const AdminClientDetail = () => {
             <h2 className="font-display text-lg text-foreground mb-4">Record Payment</h2>
             <form onSubmit={handlePayment} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-muted-foreground mb-1.5">Amount (£) *</label>
+                <label className="block text-xs text-muted-foreground mb-1.5">Amount (¥) *</label>
                 <input
                   required
                   type="number"
-                  step="0.01"
-                  min="0.01"
+                  step="1"
+                  min="1"
                   value={paymentForm.amount}
                   onChange={(e) => setPaymentForm((f) => ({ ...f, amount: e.target.value }))}
                   className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                  placeholder="e.g. 5000.00"
+                  placeholder="e.g. 975000"
                 />
               </div>
               <div>
@@ -942,6 +943,9 @@ const AdminClientDetail = () => {
               </div>
             </form>
           </div>
+
+          {/* Exchange rate info */}
+          <ExchangeRateInfo variant="minimal" className="px-6 py-3" />
         </div>
       )}
 
@@ -1067,16 +1071,16 @@ const AdminClientDetail = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1.5">Amount (£) *</label>
+                <label className="block text-xs text-muted-foreground mb-1.5">Amount (¥) *</label>
                 <input
                   required
                   type="number"
-                  step="0.01"
-                  min="0.01"
+                  step="1"
+                  min="1"
                   value={invoiceForm.amount}
                   onChange={(e) => setInvoiceForm((f) => ({ ...f, amount: e.target.value }))}
                   className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                  placeholder="e.g. 10000.00"
+                  placeholder="e.g. 1950000"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -1132,6 +1136,9 @@ const AdminClientDetail = () => {
               </div>
             </form>
           </div>
+
+          {/* Exchange rate info */}
+          <ExchangeRateInfo variant="minimal" className="px-6 py-3" />
         </div>
       )}
 
