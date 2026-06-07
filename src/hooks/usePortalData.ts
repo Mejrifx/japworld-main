@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { formatDualCurrency } from "@/lib/currency";
 import type {
   Database,
   VehicleStatus,
@@ -798,7 +799,6 @@ export function computeOutstanding(invoices: Invoice[]): number {
  * @param showGBP - Whether to show GBP conversion (default: true)
  */
 export function formatCurrency(yen: number, showGBP: boolean = true): string {
-  const { formatDualCurrency } = require("@/lib/currency");
   return formatDualCurrency(yen, { showGBP });
 }
 
