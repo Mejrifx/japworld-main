@@ -106,26 +106,35 @@ const Navigation = () => {
                     to={link.path}
                     className={`
                       relative
-                      px-4 py-2
+                      px-4 py-2.5
                       text-sm font-medium
                       border-shoji
+                      rounded-lg
                       ${isActive 
-                        ? 'bg-card/60 text-primary' 
-                        : 'bg-card/30 hover:bg-card/50 text-muted-foreground hover:text-primary'
+                        ? 'bg-card/70 text-primary shadow-md' 
+                        : 'bg-card/40 hover:bg-card/60 text-muted-foreground hover:text-primary'
                       }
-                      transition-all duration-300
+                      transition-all duration-200
                       group
-                      active:scale-[0.98]
                     `}
+                    style={{
+                      transition: 'all var(--ease-out-strong) 200ms',
+                    }}
+                    onMouseDown={(e) => {
+                      e.currentTarget.style.transform = 'scale(0.97)';
+                    }}
+                    onMouseUp={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
                   >
-                    {/* Corner accents - top left */}
-                    <div className={`absolute -top-1 -left-1 w-3 h-3 border-l border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
-                    {/* Corner accents - top right */}
-                    <div className={`absolute -top-1 -right-1 w-3 h-3 border-r border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
-                    {/* Corner accents - bottom left */}
-                    <div className={`absolute -bottom-1 -left-1 w-3 h-3 border-l border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
-                    {/* Corner accents - bottom right */}
-                    <div className={`absolute -bottom-1 -right-1 w-3 h-3 border-r border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`} />
+                    {/* Corner accents - more subtle */}
+                    <div className={`absolute -top-1 -left-1 w-2.5 h-2.5 border-l border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200 rounded-tl-sm`} />
+                    <div className={`absolute -top-1 -right-1 w-2.5 h-2.5 border-r border-t border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200 rounded-tr-sm`} />
+                    <div className={`absolute -bottom-1 -left-1 w-2.5 h-2.5 border-l border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200 rounded-bl-sm`} />
+                    <div className={`absolute -bottom-1 -right-1 w-2.5 h-2.5 border-r border-b border-primary/40 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200 rounded-br-sm`} />
                     
                     <span className="relative z-10">{link.label}</span>
                   </Link>
@@ -139,25 +148,37 @@ const Navigation = () => {
                 {user && role === "admin" ? (
                   <Link
                     to="/admin"
-                    className="relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-shoji bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 group"
+                    className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-shoji rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-200 group"
+                    style={{ transition: 'all var(--ease-out-strong) 200ms' }}
+                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   >
-                    <ShieldCheck className="h-3.5 w-3.5" />
+                    <ShieldCheck className="h-4 w-4" />
                     Admin
                   </Link>
                 ) : user && role === "client" ? (
                   <Link
                     to="/portal"
-                    className="relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-shoji bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 group"
+                    className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-shoji rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-200 group"
+                    style={{ transition: 'all var(--ease-out-strong) 200ms' }}
+                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   >
-                    <LayoutDashboard className="h-3.5 w-3.5" />
+                    <LayoutDashboard className="h-4 w-4" />
                     My Portal
                   </Link>
                 ) : (
                   <Link
                     to="/login"
-                    className="relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-shoji bg-card/30 hover:bg-card/50 text-muted-foreground hover:text-primary transition-all duration-300 group"
+                    className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-shoji rounded-lg bg-card/40 hover:bg-card/60 text-muted-foreground hover:text-primary transition-all duration-200 group"
+                    style={{ transition: 'all var(--ease-out-strong) 200ms' }}
+                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   >
-                    <LogIn className="h-3.5 w-3.5" />
+                    <LogIn className="h-4 w-4" />
                     Client Login
                   </Link>
                 )}
@@ -172,19 +193,23 @@ const Navigation = () => {
                 relative
                 p-2.5
                 border-shoji
-                bg-card/30 hover:bg-card/50
+                rounded-lg
+                bg-card/40 hover:bg-card/60
                 text-foreground hover:text-primary
-                transition-all duration-300
+                transition-all duration-200
                 group
-                active:scale-[0.98]
               "
+              style={{ transition: 'all var(--ease-out-strong) 200ms' }}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               aria-label="Toggle menu"
             >
               {/* Corner accents */}
-              <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-l border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-r border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-l border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-tl-sm" />
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-r border-t border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-tr-sm" />
+              <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-l border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-bl-sm" />
+              <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-r border-b border-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-br-sm" />
               
               <span className="relative z-10">
                 {isMobileMenuOpen ? (

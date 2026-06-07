@@ -50,21 +50,24 @@ const Footer = () => {
             <div className="flex gap-4">
               <a 
                 href="#" 
-                className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+                className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary hover:bg-primary/20 hover:border-primary/50 hover:scale-110 transition-all duration-200"
+                style={{ transition: 'all var(--ease-out-strong) 200ms' }}
                 aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a 
                 href="#" 
-                className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+                className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary hover:bg-primary/20 hover:border-primary/50 hover:scale-110 transition-all duration-200"
+                style={{ transition: 'all var(--ease-out-strong) 200ms' }}
                 aria-label="Facebook"
               >
                 <Facebook className="w-5 h-5" />
               </a>
               <a 
                 href="#" 
-                className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+                className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary hover:bg-primary/20 hover:border-primary/50 hover:scale-110 transition-all duration-200"
+                style={{ transition: 'all var(--ease-out-strong) 200ms' }}
                 aria-label="YouTube"
               >
                 <Youtube className="w-5 h-5" />
@@ -164,14 +167,21 @@ const Footer = () => {
                     text-sm
                   "
                 />
-                <button className="
-                  px-4 py-2 
-                  bg-primary/20 hover:bg-primary/30
-                  border border-primary/50 hover:border-primary
-                  text-primary
-                  transition-all duration-200
-                  text-sm font-medium
-                ">
+                <button 
+                  className="
+                    px-4 py-2 
+                    bg-primary/20 hover:bg-primary/30
+                    border border-primary/50 hover:border-primary
+                    text-primary
+                    rounded-lg
+                    transition-all duration-200
+                    text-sm font-medium
+                  "
+                  style={{ transition: 'all var(--ease-out-strong) 200ms' }}
+                  onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
+                  onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
                   Subscribe
                 </button>
               </div>

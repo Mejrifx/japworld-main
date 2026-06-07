@@ -103,22 +103,17 @@ const services = [
 const Services = () => {
   return (
     <PageLayout>
-      {/* Hero Section */}
-      <section className="relative py-20 sm:py-28 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-card/20 to-background" />
+      {/* Hero Section - Refined */}
+      <section className="relative py-24 sm:py-32 md:py-40 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/10 to-background" />
         
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-          <div className="text-center mb-16 sm:mb-20 animate-fade-in">
-            <span className="block text-primary/40 text-3xl mb-6 font-display">サービス</span>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-6">
+          <div className="text-center mb-20 sm:mb-24 animate-fade-in">
+            <span className="block text-primary/35 text-4xl sm:text-5xl mb-8 font-display tracking-tight">サービス</span>
+            <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-foreground mb-8 tracking-tight text-balance">
               Our Services
             </h1>
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <span className="h-px w-20 sm:w-32 bg-gradient-to-r from-transparent to-primary/50" />
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              <span className="h-px w-20 sm:w-32 bg-gradient-to-l from-transparent to-primary/50" />
-            </div>
-            <p className="text-muted-foreground text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
+            <p className="text-muted-foreground text-xl sm:text-2xl max-w-4xl mx-auto leading-relaxed text-pretty">
               Comprehensive import services covering every aspect of bringing your dream car 
               from Japan to your doorstep. We handle the complexity so you can enjoy the journey.
             </p>
@@ -126,45 +121,45 @@ const Services = () => {
         </div>
       </section>
 
-      {/* Services Grid */}
-      <section className="relative py-20 sm:py-28">
-        <div className="absolute top-0 left-0 right-0 h-px">
-          <div className="h-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-        </div>
-
+      {/* Services Grid - Premium Layout */}
+      <section className="relative py-20 sm:py-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {services.map((service, index) => {
               const Icon = service.icon;
               return (
                 <div
                   key={index}
-                  className="border-shoji p-6 sm:p-8 bg-card/40 backdrop-blur-sm relative group hover:bg-card/60 transition-all duration-300"
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  className="border-shoji p-8 sm:p-10 bg-card/50 backdrop-blur-xl relative group hover:bg-card/70 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                  style={{ 
+                    animationDelay: `${index * 100}ms`,
+                    animation: 'scale-in 500ms cubic-bezier(0.23, 1, 0.32, 1) forwards',
+                    opacity: 0
+                  }}
                 >
-                  <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-primary/60 transition-all duration-300 group-hover:w-6 group-hover:h-6" />
-                  <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-primary/60 transition-all duration-300 group-hover:w-6 group-hover:h-6" />
+                  <div className="absolute -top-2 -left-2 w-3 h-3 border-l-2 border-t-2 border-primary/50 transition-all duration-300 group-hover:w-5 group-hover:h-5 group-hover:border-primary" />
+                  <div className="absolute -top-2 -right-2 w-3 h-3 border-r-2 border-t-2 border-primary/50 transition-all duration-300 group-hover:w-5 group-hover:h-5 group-hover:border-primary" />
                   
-                  <div className="mb-6">
-                    <div className="w-16 h-16 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <div className="mb-8">
+                    <div className="w-16 h-16 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center mb-5 group-hover:bg-primary/20 group-hover:border-primary/50 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
                       <Icon className="w-8 h-8 text-primary" />
                     </div>
-                    <span className="text-primary/40 text-lg font-display">{service.subtitle}</span>
+                    <span className="text-primary/35 text-lg font-display tracking-tight">{service.subtitle}</span>
                   </div>
                   
-                  <h3 className="font-display text-xl sm:text-2xl text-foreground mb-3">
+                  <h3 className="font-display text-2xl sm:text-3xl text-foreground mb-4 tracking-tight">
                     {service.title}
                   </h3>
                   
-                  <p className="text-muted-foreground leading-relaxed mb-6 text-sm sm:text-base">
+                  <p className="text-muted-foreground leading-relaxed mb-8 text-base sm:text-lg text-pretty">
                     {service.description}
                   </p>
                   
-                  <div className="space-y-2">
+                  <div className="space-y-3.5">
                     {service.features.map((feature, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span>{feature}</span>
+                      <div key={i} className="flex items-start gap-3 text-sm sm:text-base text-muted-foreground">
+                        <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="leading-relaxed">{feature}</span>
                       </div>
                     ))}
                   </div>
@@ -174,11 +169,11 @@ const Services = () => {
           </div>
         </div>
 
-        {/* Bottom accent */}
-        <div className="flex items-center justify-center gap-4 mt-16 sm:mt-20">
-          <span className="h-px w-20 bg-gradient-to-r from-transparent to-primary/30" />
-          <span className="text-primary/30 text-lg font-display">専門</span>
-          <span className="h-px w-20 bg-gradient-to-l from-transparent to-primary/30" />
+        {/* Bottom accent - refined */}
+        <div className="flex items-center justify-center gap-5 mt-20 sm:mt-24">
+          <span className="h-px w-24 bg-gradient-to-r from-transparent to-primary/25" />
+          <span className="text-primary/30 text-xl sm:text-2xl font-display tracking-tight">専門</span>
+          <span className="h-px w-24 bg-gradient-to-l from-transparent to-primary/25" />
         </div>
       </section>
     </PageLayout>
