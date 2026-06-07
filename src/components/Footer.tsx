@@ -49,7 +49,9 @@ const Footer = () => {
             {/* Social Links */}
             <div className="flex gap-4">
               <a 
-                href="#" 
+                href="https://www.instagram.com/japworldofficial/" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary hover:bg-primary/20 hover:border-primary/50 hover:scale-110 transition-all duration-200"
                 style={{ transition: 'all var(--ease-out-strong) 200ms' }}
                 aria-label="Instagram"
