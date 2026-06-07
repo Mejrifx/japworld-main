@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   ChevronDown,
   User,
+  Mail,
 } from "lucide-react";
 import japworldLogo from "@/assets/japworld-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,6 +21,7 @@ const navItems = [
   { label: "Dashboard", path: "/admin", icon: LayoutDashboard },
   { label: "Clients", path: "/admin/clients", icon: Users },
   { label: "Vehicles", path: "/admin/vehicles", icon: Car },
+  { label: "Enquiries", path: "/admin/enquiries", icon: Mail },
 ];
 
 interface AdminLayoutProps {

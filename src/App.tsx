@@ -18,6 +18,7 @@ import Auctions from "./pages/Auctions";
 import FAQ from "./pages/FAQ";
 import Testimonials from "./pages/Testimonials";
 import Contact from "./pages/Contact";
+import Enquiry from "./pages/Enquiry";
 import NotFound from "./pages/NotFound";
 
 // Auth pages
@@ -40,6 +41,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminClients from "./pages/admin/AdminClients";
 import AdminClientDetail from "./pages/admin/AdminClientDetail";
 import AdminVehicles from "./pages/admin/AdminVehicles";
+import AdminEnquiries from "./pages/admin/AdminEnquiries";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,6 +71,7 @@ const App = () => (
             <Route path="/faq" element={<FAQ />} />
             <Route path="/testimonials" element={<Testimonials />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/enquiry" element={<Enquiry />} />
 
             {/* ── Auth ── */}
             <Route path="/login" element={<Login />} />
@@ -171,6 +174,14 @@ const App = () => (
               element={
                 <AdminRoute>
                   <AdminVehicles />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/enquiries"
+              element={
+                <AdminRoute>
+                  <AdminEnquiries />
                 </AdminRoute>
               }
             />

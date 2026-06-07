@@ -11,6 +11,7 @@ export type InvoiceStatus = "draft" | "issued" | "paid" | "partially_paid" | "ov
 export type VehicleStatus = "in_yard" | "waiting_booking" | "loaded" | "on_ship";
 export type DocumentType = "photo" | "auction_sheet" | "invoice" | "other";
 export type UserRole = "client" | "admin";
+export type EnquiryStatus = "new" | "read" | "responded" | "resolved";
 
 export interface Database {
   public: {
@@ -258,6 +259,49 @@ export interface Database {
           updated_at?: string;
         };
       };
+      enquiries: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          phone: string | null;
+          company: string | null;
+          vehicle_interest: string | null;
+          message: string;
+          budget_range: string | null;
+          status: EnquiryStatus;
+          admin_notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          email: string;
+          phone?: string | null;
+          company?: string | null;
+          vehicle_interest?: string | null;
+          message: string;
+          budget_range?: string | null;
+          status?: EnquiryStatus;
+          admin_notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          email?: string;
+          phone?: string | null;
+          company?: string | null;
+          vehicle_interest?: string | null;
+          message?: string;
+          budget_range?: string | null;
+          status?: EnquiryStatus;
+          admin_notes?: string | null;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -276,6 +320,7 @@ export interface Database {
       vehicle_status: VehicleStatus;
       document_type: DocumentType;
       user_role: UserRole;
+      enquiry_status: EnquiryStatus;
     };
   };
 }

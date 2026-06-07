@@ -23,6 +23,7 @@ const navLinks = [
   { label: "FAQ", path: "/faq" },
   { label: "Testimonials", path: "/testimonials" },
   { label: "Contact", path: "/contact" },
+  { label: "Enquiry", path: "/enquiry" },
 ];
 
 const Navigation = () => {
