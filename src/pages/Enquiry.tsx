@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Send, CheckCircle, Mail, User, Phone, Building2, Car, MessageSquare, Coins } from "lucide-react";
+import { Send, CheckCircle, Mail, User, Phone, Building2, Car, MessageSquare, Coins, X } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 import { useSubmitEnquiry } from "@/hooks/useEnquiries";
 
 const Enquiry = () => {
   const submitEnquiry = useSubmitEnquiry();
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -18,6 +19,7 @@ const Enquiry = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
       await submitEnquiry.mutateAsync(form);
       setSubmitted(true);
@@ -32,8 +34,9 @@ const Enquiry = () => {
       });
       // Reset after 5 seconds
       setTimeout(() => setSubmitted(false), 5000);
-    } catch (error) {
-      console.error("Error submitting enquiry:", error);
+    } catch (err: any) {
+      console.error("Error submitting enquiry:", err);
+      setError(err?.message || "Failed to submit enquiry. Please try again or contact us directly.");
     }
   };
 
@@ -66,6 +69,27 @@ const Enquiry = () => {
                 <h3 className="font-display text-lg text-emerald-400 mb-2">Enquiry Submitted Successfully!</h3>
                 <p className="text-muted-foreground text-sm">
                   Thank you for your enquiry. Our team will review your request and get back to you within 24 hours.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-8 border-shoji bg-red-400/10 border-red-400/30 p-6 animate-fade-in">
+            <div className="flex items-start gap-4">
+              <div className="h-6 w-6 rounded-full bg-red-400/20 flex items-center justify-center flex-shrink-0 mt-1">
+                <X className="h-4 w-4 text-red-400" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg text-red-400 mb-2">Submission Failed</h3>
+                <p className="text-muted-foreground text-sm">{error}</p>
+                <p className="text-muted-foreground text-sm mt-2">
+                  Please try again or contact us directly at{" "}
+                  <a href="mailto:Japworldofficial@gmail.com" className="text-primary hover:underline">
+                    Japworldofficial@gmail.com
+                  </a>
                 </p>
               </div>
             </div>

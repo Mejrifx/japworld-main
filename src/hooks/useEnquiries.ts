@@ -13,12 +13,17 @@ type EnquiryUpdate = Database["public"]["Tables"]["enquiries"]["Update"];
 export function useSubmitEnquiry() {
   return useMutation({
     mutationFn: async (input: EnquiryInsert) => {
+      console.log("Submitting enquiry:", input);
       const { data, error } = await supabase
         .from("enquiries")
         .insert(input)
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+      console.log("Enquiry submitted successfully:", data);
       return data;
     },
   });
