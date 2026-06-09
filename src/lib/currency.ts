@@ -116,3 +116,43 @@ export function getExchangeRateInfo(): string {
 export function migrateGBPToJPY(oldAmountPence: number): number {
   return gbpToJpy(oldAmountPence);
 }
+
+export type InvoiceCurrency = "JPY" | "GBP";
+
+/**
+ * Convert GBP pounds to JPY (whole yen)
+ */
+export function gbpPoundsToJpy(pounds: number): number {
+  return Math.round(pounds * GBP_TO_JPY_RATE);
+}
+
+/**
+ * Convert JPY to GBP pounds
+ */
+export function jpyToGbpPounds(yen: number): number {
+  return yen / GBP_TO_JPY_RATE;
+}
+
+/**
+ * Parse admin invoice amount input and return JPY for database storage
+ */
+export function parseInvoiceAmountToJpy(amount: string, currency: InvoiceCurrency): number {
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed) || parsed <= 0) return 0;
+  if (currency === "JPY") return Math.round(parsed);
+  return gbpPoundsToJpy(parsed);
+}
+
+/**
+ * Preview text for the other currency while admin enters an amount
+ */
+export function getInvoiceAmountPreview(amount: string, currency: InvoiceCurrency): string | null {
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed) || parsed <= 0) return null;
+  if (currency === "JPY") {
+    const pounds = jpyToGbpPounds(Math.round(parsed));
+    return `≈ ${formatGBP(Math.round(pounds * 100))}`;
+  }
+  const yen = gbpPoundsToJpy(parsed);
+  return `≈ ${formatJPY(yen)}`;
+}

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { formatDualCurrency } from "@/lib/currency";
+import { formatDualCurrency, jpyToGbpPounds } from "@/lib/currency";
+import type { InvoiceCurrency } from "@/lib/database.types";
 import type {
   Database,
   VehicleStatus,
@@ -349,6 +350,12 @@ export function useCreateInvoice() {
         if (clientData) {
           const { generateAndUploadInvoicePDF } = await import("@/lib/invoicePDF");
           
+          const invoiceCurrency = (data.currency as InvoiceCurrency) || "JPY";
+          const pdfAmount =
+            invoiceCurrency === "GBP"
+              ? jpyToGbpPounds(data.amount_cents)
+              : data.amount_cents;
+
           const invoiceData = {
             invoiceNumber: data.invoice_number || `INV-${data.id.substring(0, 8).toUpperCase()}`,
             invoiceDate: new Date(data.created_at),
@@ -357,8 +364,8 @@ export function useCreateInvoice() {
             clientCompany: clientData.company_name,
             clientEmail: clientData.email,
             description: data.description,
-            amount: data.amount_cents, // Amount in JPY
-            currency: "JPY",
+            amount: pdfAmount,
+            currency: invoiceCurrency,
           };
 
           const pdfResult = await generateAndUploadInvoicePDF(

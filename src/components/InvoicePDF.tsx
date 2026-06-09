@@ -6,6 +6,7 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 import { format } from "date-fns";
+import { GBP_TO_JPY_RATE } from "@/lib/currency";
 
 const styles = StyleSheet.create({
   page: {
@@ -205,17 +206,17 @@ export const InvoicePDF = ({
   const subtotal = vatRate ? amount / (1 + vatRate / 100) : amount;
   const vatAmount = vatRate ? amount - subtotal : 0;
 
-  // Format JPY with GBP conversion
   const formatCurrency = (value: number) => {
-    if (currency === "JPY") {
-      const jpyFormatted = `¥${Math.round(value).toLocaleString("ja-JP")}`;
-      // Convert to GBP (using rate: £1 = ¥195)
-      const gbpValue = value / 195;
-      const gbpFormatted = `£${gbpValue.toFixed(2)}`;
-      return `${jpyFormatted} (${gbpFormatted})`;
+    if (currency === "GBP") {
+      const gbpFormatted = `£${value.toFixed(2)}`;
+      const jpyValue = Math.round(value * GBP_TO_JPY_RATE);
+      const jpyFormatted = `¥${jpyValue.toLocaleString("ja-JP")}`;
+      return `${gbpFormatted} (${jpyFormatted})`;
     }
-    // Fallback for GBP only (legacy support)
-    return `£${value.toFixed(2)}`;
+    const jpyFormatted = `¥${Math.round(value).toLocaleString("ja-JP")}`;
+    const gbpValue = value / GBP_TO_JPY_RATE;
+    const gbpFormatted = `£${gbpValue.toFixed(2)}`;
+    return `${jpyFormatted} (${gbpFormatted})`;
   };
 
   return (
@@ -319,11 +320,10 @@ export const InvoicePDF = ({
           <Text style={{ marginTop: 8, fontSize: 9, color: "#666" }}>
             Please include invoice number {invoiceNumber} as payment reference
           </Text>
-          {currency === "JPY" && (
-            <Text style={{ marginTop: 8, fontSize: 8, color: "#999", fontStyle: "italic" }}>
-              * GBP amounts shown for reference only (Exchange rate: £1 = ¥195). Invoiced amount is in JPY.
-            </Text>
-          )}
+          <Text style={{ marginTop: 8, fontSize: 8, color: "#999", fontStyle: "italic" }}>
+            * Secondary currency shown for reference (Exchange rate: £1 = ¥{GBP_TO_JPY_RATE}).
+            Invoiced amount is in {currency}.
+          </Text>
         </View>
 
         {/* Notes */}

@@ -12,6 +12,7 @@ export type VehicleStatus = "in_yard" | "waiting_booking" | "loaded" | "on_ship"
 export type DocumentType = "photo" | "auction_sheet" | "invoice" | "other";
 export type UserRole = "client" | "admin";
 export type EnquiryStatus = "new" | "read" | "responded" | "resolved";
+export type InvoiceCurrency = "JPY" | "GBP";
 
 export interface Database {
   public: {
@@ -108,6 +109,7 @@ export interface Database {
           id: string;
           client_id: string;
           amount_cents: number;
+          currency: InvoiceCurrency;
           due_date: string | null;
           status: InvoiceStatus;
           description: string;
@@ -120,6 +122,7 @@ export interface Database {
           id?: string;
           client_id: string;
           amount_cents: number;
+          currency?: InvoiceCurrency;
           due_date?: string | null;
           status?: InvoiceStatus;
           description: string;
@@ -132,6 +135,7 @@ export interface Database {
           id?: string;
           client_id?: string;
           amount_cents?: number;
+          currency?: InvoiceCurrency;
           due_date?: string | null;
           status?: InvoiceStatus;
           description?: string;
@@ -321,6 +325,7 @@ export interface Database {
       document_type: DocumentType;
       user_role: UserRole;
       enquiry_status: EnquiryStatus;
+      invoice_currency: InvoiceCurrency;
     };
   };
 }

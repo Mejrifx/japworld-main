@@ -59,7 +59,13 @@ import type {
   VehicleStatus,
   InvoiceStatus,
   DocumentType,
+  InvoiceCurrency,
 } from "@/lib/database.types";
+import {
+  parseInvoiceAmountToJpy,
+  getInvoiceAmountPreview,
+  getExchangeRateInfo,
+} from "@/lib/currency";
 import { format } from "date-fns";
 
 type Tab = "account" | "finance" | "invoices" | "vehicles" | "notes";
@@ -420,6 +426,7 @@ const AdminClientDetail = () => {
   });
   const [invoiceForm, setInvoiceForm] = useState({
     amount: "",
+    currency: "JPY" as InvoiceCurrency,
     description: "",
     due_date: "",
     invoice_number: "",
@@ -495,12 +502,13 @@ const AdminClientDetail = () => {
   const handleInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
     setInvoiceError(null);
-    const yen = Math.round(parseFloat(invoiceForm.amount));
-    if (!yen || isNaN(yen)) { setInvoiceError("Enter a valid amount."); return; }
+    const yen = parseInvoiceAmountToJpy(invoiceForm.amount, invoiceForm.currency);
+    if (!yen) { setInvoiceError("Enter a valid amount."); return; }
     try {
       const invoice = await createInvoice.mutateAsync({
         client_id: id!,
-        amount_cents: yen, // Now storing JPY (amount_cents column now stores JPY, not cents)
+        amount_cents: yen,
+        currency: invoiceForm.currency,
         description: invoiceForm.description,
         due_date: invoiceForm.due_date || undefined,
         invoice_number: invoiceForm.invoice_number || undefined,
@@ -539,7 +547,14 @@ const AdminClientDetail = () => {
         }
       }
       
-      setInvoiceForm({ amount: "", description: "", due_date: "", invoice_number: "", vehicle_id: "" });
+      setInvoiceForm({
+        amount: "",
+        currency: "JPY",
+        description: "",
+        due_date: "",
+        invoice_number: "",
+        vehicle_id: "",
+      });
     } catch (err: unknown) {
       setInvoiceError(err instanceof Error ? err.message : "Failed.");
     }
@@ -1071,17 +1086,43 @@ const AdminClientDetail = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1.5">Amount (¥) *</label>
-                <input
-                  required
-                  type="number"
-                  step="1"
-                  min="1"
-                  value={invoiceForm.amount}
-                  onChange={(e) => setInvoiceForm((f) => ({ ...f, amount: e.target.value }))}
-                  className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                  placeholder="e.g. 1950000"
-                />
+                <label className="block text-xs text-muted-foreground mb-1.5">
+                  Amount ({invoiceForm.currency === "GBP" ? "£" : "¥"}) *
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    value={invoiceForm.currency}
+                    onChange={(e) =>
+                      setInvoiceForm((f) => ({
+                        ...f,
+                        currency: e.target.value as InvoiceCurrency,
+                        amount: "",
+                      }))
+                    }
+                    className="bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60 w-24 shrink-0"
+                  >
+                    <option value="JPY">¥ JPY</option>
+                    <option value="GBP">£ GBP</option>
+                  </select>
+                  <input
+                    required
+                    type="number"
+                    step={invoiceForm.currency === "GBP" ? "0.01" : "1"}
+                    min={invoiceForm.currency === "GBP" ? "0.01" : "1"}
+                    value={invoiceForm.amount}
+                    onChange={(e) => setInvoiceForm((f) => ({ ...f, amount: e.target.value }))}
+                    className="flex-1 bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                    placeholder={
+                      invoiceForm.currency === "GBP" ? "e.g. 10000.00" : "e.g. 1950000"
+                    }
+                  />
+                </div>
+                {invoiceForm.amount && getInvoiceAmountPreview(invoiceForm.amount, invoiceForm.currency) && (
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    {getInvoiceAmountPreview(invoiceForm.amount, invoiceForm.currency)}
+                    <span className="text-muted-foreground/70"> · {getExchangeRateInfo()}</span>
+                  </p>
+                )}
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-xs text-muted-foreground mb-1.5">Description *</label>
