@@ -312,13 +312,14 @@ export const InvoicePDF = ({
         {/* Payment Information */}
         <View style={styles.paymentInfo}>
           <Text style={[styles.sectionTitle, { marginTop: 0 }]}>PAYMENT INFORMATION</Text>
-          <Text style={{ marginBottom: 5 }}>
+          <Text style={{ marginBottom: 8 }}>
             Please make payment to the following bank account:
           </Text>
-          <Text style={{ marginBottom: 3, fontFamily: "Helvetica-Bold" }}>Bank: Lloyds Bank</Text>
-          <Text style={{ marginBottom: 3 }}>Account Name: JapWorld Limited</Text>
-          <Text style={{ marginBottom: 3 }}>Sort Code: 30-00-00</Text>
-          <Text style={{ marginBottom: 3 }}>Account Number: 12345678</Text>
+          <Text style={{ marginBottom: 3, fontFamily: "Helvetica-Bold" }}>Bank Name: Mizuho Bank Ltd.</Text>
+          <Text style={{ marginBottom: 3 }}>Branch Name: Narita Branch</Text>
+          <Text style={{ marginBottom: 3 }}>Account Name: JapWorld</Text>
+          <Text style={{ marginBottom: 3 }}>Account Number: 3033432</Text>
+          <Text style={{ marginBottom: 3 }}>SWIFT / BIC: MHCBJPJT</Text>
           <Text style={{ marginTop: 8, fontSize: 9, color: "#666" }}>
             Please include invoice number {invoiceNumber} as payment reference
           </Text>
