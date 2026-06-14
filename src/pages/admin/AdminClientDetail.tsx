@@ -60,6 +60,7 @@ import type {
   InvoiceStatus,
   DocumentType,
   InvoiceCurrency,
+  InvoiceLineItem,
 } from "@/lib/database.types";
 import {
   parseInvoiceAmountToJpy,
@@ -428,13 +429,14 @@ const AdminClientDetail = () => {
     invoice_id: "",
   });
   const [invoiceForm, setInvoiceForm] = useState({
-    amount: "",
     currency: "JPY" as InvoiceCurrency,
-    description: "",
     due_date: "",
     invoice_number: "",
     vehicle_id: "",
   });
+  const [lineItems, setLineItems] = useState<{ description: string; amount: string }[]>([
+    { description: "", amount: "" },
+  ]);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
 
@@ -502,18 +504,63 @@ const AdminClientDetail = () => {
     }
   };
 
+  const addLineItem = () =>
+    setLineItems((items) => [...items, { description: "", amount: "" }]);
+
+  const removeLineItem = (idx: number) =>
+    setLineItems((items) => items.filter((_, i) => i !== idx));
+
+  const updateLineItem = (idx: number, field: "description" | "amount", value: string) =>
+    setLineItems((items) =>
+      items.map((item, i) => (i === idx ? { ...item, [field]: value } : item))
+    );
+
+  const lineItemTotal = lineItems.reduce((sum, item) => {
+    const v = parseFloat(item.amount);
+    return sum + (isNaN(v) ? 0 : v);
+  }, 0);
+
   const handleInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
     setInvoiceError(null);
-    const yen = parseInvoiceAmountToJpy(invoiceForm.amount, invoiceForm.currency, liveRate);
-    if (!yen) { setInvoiceError("Enter a valid amount."); return; }
+
+    const validItems = lineItems.filter(
+      (item) => item.description.trim() && item.amount.trim()
+    );
+    if (validItems.length === 0) {
+      setInvoiceError("Add at least one line item with a description and amount.");
+      return;
+    }
+    for (const item of validItems) {
+      if (isNaN(parseFloat(item.amount)) || parseFloat(item.amount) <= 0) {
+        setInvoiceError("All line item amounts must be valid positive numbers.");
+        return;
+      }
+    }
+
+    // Convert each line item amount to JPY and build the typed array
+    const resolvedItems: InvoiceLineItem[] = validItems.map((item) => ({
+      description: item.description.trim(),
+      amount: parseFloat(item.amount),
+    }));
+
+    // Total in the chosen currency → convert to JPY for storage
+    const totalInCurrency = resolvedItems.reduce((s, r) => s + r.amount, 0);
+    const totalYen = parseInvoiceAmountToJpy(String(totalInCurrency), invoiceForm.currency, liveRate);
+    if (!totalYen) { setInvoiceError("Could not calculate total amount."); return; }
+
+    // Build a summary description from line items
+    const summaryDescription = resolvedItems.map((r) => r.description).join(", ");
+
     try {
       const invoice = await createInvoice.mutateAsync({
         client_id: id!,
-        amount_cents: yen,
+        amount_cents: totalYen,
         currency: invoiceForm.currency,
         exchangeRate: liveRate,
-        description: invoiceForm.description,
+        description: summaryDescription,
+        line_items: resolvedItems,
+        lineItemsData: resolvedItems,
         due_date: invoiceForm.due_date || undefined,
         invoice_number: invoiceForm.invoice_number || undefined,
         status: "issued",
@@ -551,10 +598,9 @@ const AdminClientDetail = () => {
         }
       }
       
+      setLineItems([{ description: "", amount: "" }]);
       setInvoiceForm({
-        amount: "",
         currency: "JPY",
-        description: "",
         due_date: "",
         invoice_number: "",
         vehicle_id: "",
@@ -1090,53 +1136,94 @@ const AdminClientDetail = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs text-muted-foreground mb-1.5">
-                  Amount ({invoiceForm.currency === "GBP" ? "£" : "¥"}) *
-                </label>
-                <div className="flex gap-2">
-                  <select
-                    value={invoiceForm.currency}
-                    onChange={(e) =>
-                      setInvoiceForm((f) => ({
-                        ...f,
-                        currency: e.target.value as InvoiceCurrency,
-                        amount: "",
-                      }))
-                    }
-                    className="bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60 w-24 shrink-0"
-                  >
-                    <option value="JPY">¥ JPY</option>
-                    <option value="GBP">£ GBP</option>
-                  </select>
-                  <input
-                    required
-                    type="number"
-                    step={invoiceForm.currency === "GBP" ? "0.01" : "1"}
-                    min={invoiceForm.currency === "GBP" ? "0.01" : "1"}
-                    value={invoiceForm.amount}
-                    onChange={(e) => setInvoiceForm((f) => ({ ...f, amount: e.target.value }))}
-                    className="flex-1 bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                    placeholder={
-                      invoiceForm.currency === "GBP" ? "e.g. 10000.00" : "e.g. 1950000"
-                    }
-                  />
-                </div>
-                {invoiceForm.amount && getInvoiceAmountPreview(invoiceForm.amount, invoiceForm.currency, liveRate) && (
-                  <p className="text-xs text-muted-foreground mt-1.5">
-                    {getInvoiceAmountPreview(invoiceForm.amount, invoiceForm.currency, liveRate)}
-                    <span className="text-muted-foreground/70"> · {getExchangeRateInfo(liveRate)}</span>
-                  </p>
-                )}
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-xs text-muted-foreground mb-1.5">Description *</label>
-                <input
-                  required
-                  value={invoiceForm.description}
-                  onChange={(e) => setInvoiceForm((f) => ({ ...f, description: e.target.value }))}
+                <label className="block text-xs text-muted-foreground mb-1.5">Currency</label>
+                <select
+                  value={invoiceForm.currency}
+                  onChange={(e) => {
+                    setInvoiceForm((f) => ({ ...f, currency: e.target.value as InvoiceCurrency }));
+                    setLineItems([{ description: "", amount: "" }]);
+                  }}
                   className="w-full bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
-                  placeholder="e.g. Vehicle purchase: Toyota Supra JZA80"
-                />
+                >
+                  <option value="JPY">¥ JPY</option>
+                  <option value="GBP">£ GBP</option>
+                </select>
+              </div>
+
+              {/* Line Items */}
+              <div className="sm:col-span-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs text-muted-foreground">Line Items *</label>
+                  <button
+                    type="button"
+                    onClick={addLineItem}
+                    className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+                  >
+                    + Add item
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {lineItems.map((item, idx) => (
+                    <div key={idx} className="flex gap-2 items-start">
+                      <input
+                        value={item.description}
+                        onChange={(e) => updateLineItem(idx, "description", e.target.value)}
+                        placeholder={
+                          idx === 0
+                            ? "e.g. Vehicle purchase: Toyota Supra JZA80"
+                            : idx === 1
+                            ? "e.g. International shipping"
+                            : "e.g. Import service fee"
+                        }
+                        className="flex-1 bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                      />
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-muted-foreground text-sm select-none">
+                          {invoiceForm.currency === "GBP" ? "£" : "¥"}
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          step={invoiceForm.currency === "GBP" ? "0.01" : "1"}
+                          value={item.amount}
+                          onChange={(e) => updateLineItem(idx, "amount", e.target.value)}
+                          placeholder={invoiceForm.currency === "GBP" ? "0.00" : "0"}
+                          className="w-32 bg-background/60 border border-border/60 text-foreground px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary/60"
+                        />
+                      </div>
+                      {lineItems.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeLineItem(idx)}
+                          className="text-muted-foreground hover:text-destructive transition-colors p-2.5 shrink-0"
+                          title="Remove item"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Running total */}
+                {lineItemTotal > 0 && (
+                  <div className="mt-3 pt-3 border-t border-border/40">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground">Total</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {invoiceForm.currency === "GBP"
+                          ? `£${lineItemTotal.toFixed(2)}`
+                          : `¥${Math.round(lineItemTotal).toLocaleString("ja-JP")}`}
+                      </span>
+                    </div>
+                    {lineItemTotal > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {getInvoiceAmountPreview(String(lineItemTotal), invoiceForm.currency, liveRate)}
+                        <span className="text-muted-foreground/70"> · {getExchangeRateInfo(liveRate)}</span>
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-xs text-muted-foreground mb-1.5">Link to Vehicle (optional)</label>

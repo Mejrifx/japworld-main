@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { formatDualCurrency, jpyToGbpPounds, GBP_TO_JPY_RATE } from "@/lib/currency";
 import { useExchangeRateContext } from "@/contexts/ExchangeRateContext";
-import type { InvoiceCurrency } from "@/lib/database.types";
+import type { InvoiceCurrency, InvoiceLineItem } from "@/lib/database.types";
 import type {
   Database,
   VehicleStatus,
@@ -332,8 +332,9 @@ export function useCreateInvoice() {
     mutationFn: async (input: Database["public"]["Tables"]["invoices"]["Insert"] & { 
       clientData?: { company_name: string; contact_name: string; email?: string }
       exchangeRate?: number
+      lineItemsData?: InvoiceLineItem[]
     }) => {
-      const { clientData, exchangeRate, ...invoiceInput } = input;
+      const { clientData, exchangeRate, lineItemsData, ...invoiceInput } = input;
       const liveRate = exchangeRate ?? rate;
       
       // Create invoice record first
@@ -371,6 +372,7 @@ export function useCreateInvoice() {
             amount: pdfAmount,
             currency: invoiceCurrency,
             exchangeRate: liveRate,
+            lineItems: (data.line_items as InvoiceLineItem[] | null) ?? lineItemsData ?? null,
           };
 
           const pdfResult = await generateAndUploadInvoicePDF(

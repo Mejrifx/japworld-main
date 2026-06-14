@@ -7,6 +7,7 @@ import {
 } from "@react-pdf/renderer";
 import { format } from "date-fns";
 import { GBP_TO_JPY_RATE } from "@/lib/currency";
+import type { InvoiceLineItem } from "@/lib/database.types";
 
 const styles = StyleSheet.create({
   page: {
@@ -188,6 +189,7 @@ export interface InvoiceData {
   exchangeRate?: number;
   vatRate?: number;
   notes?: string;
+  lineItems?: InvoiceLineItem[] | null;
 }
 
 export const InvoicePDF = ({
@@ -204,9 +206,17 @@ export const InvoicePDF = ({
   exchangeRate = GBP_TO_JPY_RATE,
   vatRate,
   notes,
+  lineItems,
 }: InvoiceData) => {
-  const subtotal = vatRate ? amount / (1 + vatRate / 100) : amount;
-  const vatAmount = vatRate ? amount - subtotal : 0;
+  // Resolve rows: use line items if available, otherwise fall back to legacy single row
+  const rows: InvoiceLineItem[] =
+    lineItems && lineItems.length > 0
+      ? lineItems
+      : [{ description, amount }];
+
+  const subtotal = rows.reduce((sum, r) => sum + r.amount, 0);
+  const vatAmount = vatRate ? subtotal * (vatRate / 100) : 0;
+  const total = subtotal + vatAmount;
 
   const formatCurrency = (value: number) => {
     if (currency === "GBP") {
@@ -220,6 +230,9 @@ export const InvoicePDF = ({
     const gbpFormatted = `£${gbpValue.toFixed(2)}`;
     return `${jpyFormatted} (${gbpFormatted})`;
   };
+
+  const formatAmount = (value: number) =>
+    currency === "GBP" ? `£${value.toFixed(2)}` : `¥${Math.round(value).toLocaleString("ja-JP")}`;
 
   return (
     <Document>
@@ -279,33 +292,33 @@ export const InvoicePDF = ({
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableCol1}>Description</Text>
-            <Text style={styles.tableCol2}>Qty</Text>
             <Text style={styles.tableCol3}>Amount</Text>
           </View>
-          <View style={styles.tableRow}>
-            <Text style={styles.tableCol1}>{description}</Text>
-            <Text style={styles.tableCol2}>1</Text>
-            <Text style={styles.tableCol3}>{formatCurrency(subtotal)}</Text>
-          </View>
+          {rows.map((row, i) => (
+            <View key={i} style={styles.tableRow}>
+              <Text style={styles.tableCol1}>{row.description}</Text>
+              <Text style={styles.tableCol3}>{formatAmount(row.amount)}</Text>
+            </View>
+          ))}
         </View>
 
         {/* Totals */}
         <View style={styles.totalsSection}>
+          {rows.length > 1 && (
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Subtotal</Text>
+              <Text style={styles.totalValue}>{formatAmount(subtotal)}</Text>
+            </View>
+          )}
           {vatRate && vatRate > 0 ? (
-            <>
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Subtotal</Text>
-                <Text style={styles.totalValue}>{formatCurrency(subtotal)}</Text>
-              </View>
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>VAT ({vatRate}%)</Text>
-                <Text style={styles.totalValue}>{formatCurrency(vatAmount)}</Text>
-              </View>
-            </>
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>VAT ({vatRate}%)</Text>
+              <Text style={styles.totalValue}>{formatAmount(vatAmount)}</Text>
+            </View>
           ) : null}
           <View style={styles.grandTotalRow}>
             <Text style={styles.grandTotalLabel}>Total Amount Due</Text>
-            <Text style={styles.grandTotalValue}>{formatCurrency(amount)}</Text>
+            <Text style={styles.grandTotalValue}>{formatCurrency(total)}</Text>
           </View>
         </View>
 

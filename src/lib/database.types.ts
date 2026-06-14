@@ -14,6 +14,12 @@ export type UserRole = "client" | "admin";
 export type EnquiryStatus = "new" | "read" | "responded" | "resolved";
 export type InvoiceCurrency = "JPY" | "GBP";
 
+export interface InvoiceLineItem {
+  description: string;
+  /** Amount in the invoice's currency (JPY whole yen, or GBP pounds with decimals) */
+  amount: number;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -115,6 +121,7 @@ export interface Database {
           description: string;
           invoice_number: string | null;
           pdf_storage_path: string | null;
+          line_items: InvoiceLineItem[] | null;
           created_at: string;
           updated_at: string;
         };
@@ -128,6 +135,7 @@ export interface Database {
           description: string;
           invoice_number?: string | null;
           pdf_storage_path?: string | null;
+          line_items?: InvoiceLineItem[] | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -141,6 +149,7 @@ export interface Database {
           description?: string;
           invoice_number?: string | null;
           pdf_storage_path?: string | null;
+          line_items?: InvoiceLineItem[] | null;
           updated_at?: string;
         };
       };
