@@ -315,11 +315,21 @@ export const InvoicePDF = ({
           <Text style={{ marginBottom: 8 }}>
             Please make payment to the following bank account:
           </Text>
-          <Text style={{ marginBottom: 3, fontFamily: "Helvetica-Bold" }}>Bank Name: Mizuho Bank Ltd.</Text>
-          <Text style={{ marginBottom: 3 }}>Branch Name: Narita Branch</Text>
-          <Text style={{ marginBottom: 3 }}>Account Name: JapWorld</Text>
-          <Text style={{ marginBottom: 3 }}>Account Number: 3033432</Text>
-          <Text style={{ marginBottom: 3 }}>SWIFT / BIC: MHCBJPJT</Text>
+          <Text style={{ marginBottom: 3 }}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Bank Name: </Text>Mizuho Bank Ltd.
+          </Text>
+          <Text style={{ marginBottom: 3 }}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Branch Name: </Text>Narita Branch
+          </Text>
+          <Text style={{ marginBottom: 3 }}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Account Name: </Text>JapWorld
+          </Text>
+          <Text style={{ marginBottom: 3 }}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Account Number: </Text>3033432
+          </Text>
+          <Text style={{ marginBottom: 3 }}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>SWIFT / BIC: </Text>MHCBJPJT
+          </Text>
           <Text style={{ marginTop: 8, fontSize: 9, color: "#666" }}>
             Please include invoice number {invoiceNumber} as payment reference
           </Text>
