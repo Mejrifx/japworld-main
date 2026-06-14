@@ -4,7 +4,13 @@ import {
   Text,
   View,
   StyleSheet,
+  Image,
 } from "@react-pdf/renderer";
+
+const LOGO_URL =
+  typeof window !== "undefined"
+    ? `${window.location.origin}/JapWorld%20Logo%20TEXT%20ONLY.png`
+    : "";
 import { format } from "date-fns";
 import { GBP_TO_JPY_RATE } from "@/lib/currency";
 import type { InvoiceLineItem } from "@/lib/database.types";
@@ -24,8 +30,9 @@ const styles = StyleSheet.create({
     borderBottom: "2px solid #d4af37",
   },
   logo: {
-    width: 120,
-    height: "auto",
+    width: 160,
+    height: 60,
+    objectFit: "contain",
   },
   companyInfo: {
     textAlign: "right",
@@ -240,10 +247,7 @@ export const InvoicePDF = ({
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.companyName}>JapWorld</Text>
-            <Text style={{ fontSize: 11, color: "#666", marginBottom: 10 }}>
-              Premium Japanese Vehicle Import
-            </Text>
+            <Image src={LOGO_URL} style={styles.logo} />
           </View>
           <View style={styles.companyInfo}>
             <Text>JapWorld</Text>
