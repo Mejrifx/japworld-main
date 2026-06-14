@@ -4,12 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   useMyTransactions,
   computeBalance,
-  formatCurrency,
+  useFormatCurrency,
 } from "@/hooks/usePortalData";
 import { format } from "date-fns";
 
 const PortalTransactions = () => {
   const { clientId } = useAuth();
+  const formatCurrency = useFormatCurrency();
   const { data: transactions = [], isLoading } = useMyTransactions(clientId);
 
   const balance = computeBalance(transactions);

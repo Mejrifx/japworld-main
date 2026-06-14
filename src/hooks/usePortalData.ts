@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { formatDualCurrency, jpyToGbpPounds } from "@/lib/currency";
+import { formatDualCurrency, jpyToGbpPounds, GBP_TO_JPY_RATE } from "@/lib/currency";
+import { useExchangeRateContext } from "@/contexts/ExchangeRateContext";
 import type { InvoiceCurrency } from "@/lib/database.types";
 import type {
   Database,
@@ -326,11 +327,14 @@ export function useRecordPayment() {
 
 export function useCreateInvoice() {
   const qc = useQueryClient();
+  const { rate } = useExchangeRateContext();
   return useMutation({
     mutationFn: async (input: Database["public"]["Tables"]["invoices"]["Insert"] & { 
-      clientData?: { company_name: string; contact_name: string; email?: string } 
+      clientData?: { company_name: string; contact_name: string; email?: string }
+      exchangeRate?: number
     }) => {
-      const { clientData, ...invoiceInput } = input;
+      const { clientData, exchangeRate, ...invoiceInput } = input;
+      const liveRate = exchangeRate ?? rate;
       
       // Create invoice record first
       const { data, error } = await supabase.from("invoices").insert(invoiceInput).select().single();
@@ -353,7 +357,7 @@ export function useCreateInvoice() {
           const invoiceCurrency = (data.currency as InvoiceCurrency) || "JPY";
           const pdfAmount =
             invoiceCurrency === "GBP"
-              ? jpyToGbpPounds(data.amount_cents)
+              ? jpyToGbpPounds(data.amount_cents, liveRate)
               : data.amount_cents;
 
           const invoiceData = {
@@ -366,6 +370,7 @@ export function useCreateInvoice() {
             description: data.description,
             amount: pdfAmount,
             currency: invoiceCurrency,
+            exchangeRate: liveRate,
           };
 
           const pdfResult = await generateAndUploadInvoicePDF(
@@ -800,13 +805,20 @@ export function computeOutstanding(invoices: Invoice[]): number {
 }
 
 /**
- * Format currency as JPY with GBP conversion
- * Note: Database amounts are now stored as JPY (not cents/pence)
- * @param yen - Amount in Japanese Yen
- * @param showGBP - Whether to show GBP conversion (default: true)
+ * Static formatter using the hardcoded fallback rate.
+ * Prefer useFormatCurrency() inside React components to get the live rate.
  */
-export function formatCurrency(yen: number, showGBP: boolean = true): string {
-  return formatDualCurrency(yen, { showGBP });
+export function formatCurrency(yen: number, showGBP = true): string {
+  return formatDualCurrency(yen, { showGBP }, GBP_TO_JPY_RATE);
+}
+
+/**
+ * React hook that returns a formatCurrency function using the live exchange rate.
+ * Use this in portal/admin components instead of the static formatCurrency above.
+ */
+export function useFormatCurrency() {
+  const { rate } = useExchangeRateContext();
+  return (yen: number, showGBP = true) => formatDualCurrency(yen, { showGBP }, rate);
 }
 
 export const VEHICLE_STATUS_LABELS: Record<VehicleStatus, string> = {

@@ -185,6 +185,7 @@ export interface InvoiceData {
   description: string;
   amount: number;
   currency?: string;
+  exchangeRate?: number;
   vatRate?: number;
   notes?: string;
 }
@@ -200,6 +201,7 @@ export const InvoicePDF = ({
   description,
   amount,
   currency = "JPY",
+  exchangeRate = GBP_TO_JPY_RATE,
   vatRate,
   notes,
 }: InvoiceData) => {
@@ -209,12 +211,12 @@ export const InvoicePDF = ({
   const formatCurrency = (value: number) => {
     if (currency === "GBP") {
       const gbpFormatted = `£${value.toFixed(2)}`;
-      const jpyValue = Math.round(value * GBP_TO_JPY_RATE);
+      const jpyValue = Math.round(value * exchangeRate);
       const jpyFormatted = `¥${jpyValue.toLocaleString("ja-JP")}`;
       return `${gbpFormatted} (${jpyFormatted})`;
     }
     const jpyFormatted = `¥${Math.round(value).toLocaleString("ja-JP")}`;
-    const gbpValue = value / GBP_TO_JPY_RATE;
+    const gbpValue = value / exchangeRate;
     const gbpFormatted = `£${gbpValue.toFixed(2)}`;
     return `${jpyFormatted} (${gbpFormatted})`;
   };
@@ -321,7 +323,7 @@ export const InvoicePDF = ({
             Please include invoice number {invoiceNumber} as payment reference
           </Text>
           <Text style={{ marginTop: 8, fontSize: 8, color: "#999", fontStyle: "italic" }}>
-            * Secondary currency shown for reference (Exchange rate: £1 = ¥{GBP_TO_JPY_RATE}).
+            * Secondary currency shown for reference (Exchange rate: £1 = ¥{exchangeRate % 1 === 0 ? exchangeRate : exchangeRate.toFixed(2)}).
             Invoiced amount is in {currency}.
           </Text>
         </View>

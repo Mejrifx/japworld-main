@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ClientRoute } from "@/components/ClientRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import { FloatingWhatsAppButton } from "@/components/FloatingWhatsAppButton";
+import { ExchangeRateProvider } from "@/contexts/ExchangeRateContext";
 
 // Public pages
 import Index from "./pages/Index";
@@ -54,6 +55,7 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <ExchangeRateProvider>
     <ThemeProvider>
       <TooltipProvider>
         <Toaster />
@@ -193,6 +195,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </ThemeProvider>
+  </ExchangeRateProvider>
   </QueryClientProvider>
 );
 

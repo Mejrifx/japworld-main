@@ -7,13 +7,14 @@ import {
   useMyInvoices,
   computeBalance,
   computeOutstanding,
-  formatCurrency,
+  useFormatCurrency,
 } from "@/hooks/usePortalData";
 import { format } from "date-fns";
 import { ExchangeRateInfo } from "@/components/ExchangeRateInfo";
 
 const PortalAccount = () => {
   const { clientId } = useAuth();
+  const formatCurrency = useFormatCurrency();
   const { data: client, isLoading } = useMyClient(clientId);
   const { data: transactions = [] } = useMyTransactions(clientId);
   const { data: invoices = [] } = useMyInvoices(clientId);

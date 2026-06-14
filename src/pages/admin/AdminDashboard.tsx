@@ -4,7 +4,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import {
   useAllClients,
   useAllVehicles,
-  formatCurrency,
+  useFormatCurrency,
   VEHICLE_STATUS_LABELS,
 } from "@/hooks/usePortalData";
 import type { VehicleStatus } from "@/lib/database.types";

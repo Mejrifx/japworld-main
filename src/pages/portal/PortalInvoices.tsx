@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   useMyInvoices,
   computeOutstanding,
-  formatCurrency,
+  useFormatCurrency,
   INVOICE_STATUS_LABELS,
   INVOICE_STATUS_COLORS,
 } from "@/hooks/usePortalData";
@@ -16,6 +16,7 @@ import { format } from "date-fns";
 
 const PortalInvoices = () => {
   const { clientId } = useAuth();
+  const formatCurrency = useFormatCurrency();
   const { data: invoices = [], isLoading } = useMyInvoices(clientId);
   
   // PDF viewer state

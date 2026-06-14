@@ -46,7 +46,7 @@ import {
   useDeleteClientNote,
   computeBalance,
   computeOutstanding,
-  formatCurrency,
+  useFormatCurrency,
   VEHICLE_STATUS_LABELS,
   VEHICLE_STATUS_COLORS,
   INVOICE_STATUS_LABELS,
@@ -66,6 +66,7 @@ import {
   getInvoiceAmountPreview,
   getExchangeRateInfo,
 } from "@/lib/currency";
+import { useExchangeRateContext } from "@/contexts/ExchangeRateContext";
 import { format } from "date-fns";
 
 type Tab = "account" | "finance" | "invoices" | "vehicles" | "notes";
@@ -382,6 +383,8 @@ function VehicleDocPanel({ vehicleId, clientId }: { vehicleId: string; clientId:
 const AdminClientDetail = () => {
   const { id } = useParams<{ id: string }>();
   const qc = useQueryClient();
+  const formatCurrency = useFormatCurrency();
+  const { rate: liveRate } = useExchangeRateContext();
   const { data: client, isLoading } = useClientById(id);
   const { data: profile } = useProfileByClientId(id);
   const { data: transactions = [] } = useClientTransactions(id);
@@ -502,13 +505,14 @@ const AdminClientDetail = () => {
   const handleInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
     setInvoiceError(null);
-    const yen = parseInvoiceAmountToJpy(invoiceForm.amount, invoiceForm.currency);
+    const yen = parseInvoiceAmountToJpy(invoiceForm.amount, invoiceForm.currency, liveRate);
     if (!yen) { setInvoiceError("Enter a valid amount."); return; }
     try {
       const invoice = await createInvoice.mutateAsync({
         client_id: id!,
         amount_cents: yen,
         currency: invoiceForm.currency,
+        exchangeRate: liveRate,
         description: invoiceForm.description,
         due_date: invoiceForm.due_date || undefined,
         invoice_number: invoiceForm.invoice_number || undefined,
@@ -1117,10 +1121,10 @@ const AdminClientDetail = () => {
                     }
                   />
                 </div>
-                {invoiceForm.amount && getInvoiceAmountPreview(invoiceForm.amount, invoiceForm.currency) && (
+                {invoiceForm.amount && getInvoiceAmountPreview(invoiceForm.amount, invoiceForm.currency, liveRate) && (
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    {getInvoiceAmountPreview(invoiceForm.amount, invoiceForm.currency)}
-                    <span className="text-muted-foreground/70"> · {getExchangeRateInfo()}</span>
+                    {getInvoiceAmountPreview(invoiceForm.amount, invoiceForm.currency, liveRate)}
+                    <span className="text-muted-foreground/70"> · {getExchangeRateInfo(liveRate)}</span>
                   </p>
                 )}
               </div>
