@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { GBP_TO_JPY_RATE } from "@/lib/currency";
 
+// open.er-api.com is the free tier of ExchangeRate-API.
+// It is explicitly CORS-enabled (no key required, updates daily from ECB data).
 async function fetchGBPtoJPY(): Promise<number> {
-  const res = await fetch("https://api.frankfurter.app/latest?from=GBP&to=JPY");
+  const res = await fetch("https://open.er-api.com/v6/latest/GBP");
   if (!res.ok) throw new Error(`Exchange rate fetch failed: ${res.status}`);
   const data = await res.json();
+  if (data?.result !== "success") throw new Error("Exchange rate API returned non-success");
   const rate = data?.rates?.JPY;
   if (!rate || typeof rate !== "number") throw new Error("Unexpected response shape");
   return rate;
